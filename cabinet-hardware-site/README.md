@@ -82,4 +82,4 @@ If the homepage loads and shows the sample product, everything is wired up corre
 - Image upload from your computer (currently: paste an image URL — you can upload photos to Supabase's Storage section and paste the link it gives you)
 - Card payments (Razorpay/Stripe) — bank transfer only for now, as requested
 - Email notifications to customers when their order status changes
-- Linking this back to Oneaccounts, when/if you're ready for that
+- Linking this back to Oneaccounts, when/if you're ready for that - it is test
