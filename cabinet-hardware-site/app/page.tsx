@@ -70,7 +70,7 @@ export default async function HomePage() {
             ].map((finish) => (
               <div key={finish.name} className="space-y-3">
                 <div
-                  className="aspect-square rounded-full border border-stone/10"
+                  className="aspect-square rounded-full border-2 border-stone/40 ring-1 ring-black/20"
                   style={{ backgroundColor: finish.hex }}
                 />
                 <p className="text-center font-body text-xs text-stone/60">{finish.name}</p>

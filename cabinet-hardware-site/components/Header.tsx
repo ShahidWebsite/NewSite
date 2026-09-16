@@ -12,8 +12,13 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Link href="/" className="flex items-center gap-3">
           <img src="/logo.png" alt="Shahid Iqbal & Co logo" className="h-11 w-11" />
-          <span className="font-display text-2xl tracking-tight text-ink">
-            Shahid Iqbal &amp; Co
+          <span>
+            <span className="block font-display text-2xl leading-tight tracking-tight text-ink">
+              Shahid Iqbal &amp; Co
+            </span>
+            <span className="block font-body text-xs text-graphite">
+              Cabinet Handles &amp; Knobs
+            </span>
           </span>
         </Link>
 

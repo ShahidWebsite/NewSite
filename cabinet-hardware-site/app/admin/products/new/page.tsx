@@ -6,6 +6,9 @@ import { supabase } from "@/lib/supabase";
 
 type VariantRow = { finish: string; size: string; price: string; stock: string; sku: string };
 type SpecRow = { key: string; value: string };
+type ImageFile = { file: File; previewUrl: string };
+
+const STORAGE_BUCKET = "product-images";
 
 function slugify(text: string) {
   return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -18,7 +21,7 @@ export default function NewProductPage() {
   const [categoryId, setCategoryId] = useState("");
   const [description, setDescription] = useState("");
   const [basePrice, setBasePrice] = useState("");
-  const [imageUrls, setImageUrls] = useState<string[]>([""]);
+  const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
   const [specs, setSpecs] = useState<SpecRow[]>([{ key: "Material", value: "" }]);
   const [variants, setVariants] = useState<VariantRow[]>([
     { finish: "", size: "", price: "", stock: "", sku: "" },
@@ -32,6 +35,36 @@ export default function NewProductPage() {
 
   function updateVariant(i: number, field: keyof VariantRow, value: string) {
     setVariants((prev) => prev.map((v, idx) => (idx === i ? { ...v, [field]: value } : v)));
+  }
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    const newImages = files.map((file) => ({ file, previewUrl: URL.createObjectURL(file) }));
+    setImageFiles((prev) => [...prev, ...newImages]);
+    e.target.value = ""; // allow selecting the same file again if removed and re-added
+  }
+
+  function removeImage(index: number) {
+    setImageFiles((prev) => {
+      URL.revokeObjectURL(prev[index].previewUrl);
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
+  async function uploadImages(productId: string) {
+    const uploaded: { url: string; sort_order: number }[] = [];
+    for (let i = 0; i < imageFiles.length; i++) {
+      const { file } = imageFiles[i];
+      const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+      const path = `${productId}/${Date.now()}-${cleanName}`;
+
+      const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+      if (uploadError) throw new Error(`Image upload failed: ${uploadError.message}`);
+
+      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      uploaded.push({ url: data.publicUrl, sort_order: i });
+    }
+    return uploaded;
   }
 
   async function findOrCreateAttribute(attrName: string) {
@@ -84,10 +117,13 @@ export default function NewProductPage() {
 
       if (productError) throw productError;
 
-      const imageRows = imageUrls
-        .filter((u) => u.trim())
-        .map((url, i) => ({ product_id: product.id, url: url.trim(), sort_order: i }));
-      if (imageRows.length > 0) {
+      if (imageFiles.length > 0) {
+        const uploaded = await uploadImages(product.id);
+        const imageRows = uploaded.map((img) => ({
+          product_id: product.id,
+          url: img.url,
+          sort_order: img.sort_order,
+        }));
         const { error: imgError } = await supabase.from("product_images").insert(imageRows);
         if (imgError) throw imgError;
       }
@@ -174,25 +210,30 @@ export default function NewProductPage() {
         </div>
 
         <div>
-          <p className="font-body text-sm text-graphite">Image URLs</p>
-          {imageUrls.map((url, i) => (
-            <input
-              key={i}
-              value={url}
-              onChange={(e) =>
-                setImageUrls((prev) => prev.map((u, idx) => (idx === i ? e.target.value : u)))
-              }
-              placeholder="https://…"
-              className="mt-2 w-full border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
-            />
-          ))}
-          <button
-            type="button"
-            onClick={() => setImageUrls((prev) => [...prev, ""])}
-            className="mt-2 font-body text-sm text-graphite hover:text-ink"
-          >
-            + Add another image
-          </button>
+          <p className="font-body text-sm text-graphite">Product photos</p>
+          <div className="mt-2 flex flex-wrap gap-3">
+            {imageFiles.map((img, i) => (
+              <div key={i} className="relative h-24 w-24 border border-nickel/30">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img.previewUrl} alt="" className="h-full w-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeImage(i)}
+                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-xs text-stone"
+                  aria-label="Remove image"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            <label className="flex h-24 w-24 cursor-pointer items-center justify-center border border-dashed border-nickel/50 font-body text-xs text-graphite hover:border-ink hover:text-ink">
+              + Add photo
+              <input type="file" accept="image/*" multiple onChange={handleFileSelect} className="hidden" />
+            </label>
+          </div>
+          <p className="mt-2 font-body text-xs text-graphite">
+            Upload from your computer — the first photo becomes the main image shown on the catalog.
+          </p>
         </div>
 
         <div>
