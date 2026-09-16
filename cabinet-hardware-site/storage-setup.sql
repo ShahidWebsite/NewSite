@@ -1,12 +1,20 @@
 -- ============================================================================
--- One-time setup for product photo uploads. Run this once in Supabase's
--- SQL Editor (safe to re-run — uses "if not exists" / "on conflict" guards).
+-- One-time setup for product photo uploads.
+--
+-- IMPORTANT: before running this, create the storage bucket itself via the
+-- Supabase Dashboard (not SQL) — this is the reliable way:
+--   1. Go to Storage in the left sidebar
+--   2. Click "New bucket"
+--   3. Name it exactly: product-images
+--   4. Turn ON "Public bucket"
+--   5. Click Save
+-- THEN run this SQL below to set the upload/delete permissions.
+-- Safe to re-run.
 -- ============================================================================
 
--- Create a public storage bucket for product photos
-insert into storage.buckets (id, name, public)
-values ('product-images', 'product-images', true)
-on conflict (id) do nothing;
+drop policy if exists "Public read product images" on storage.objects;
+drop policy if exists "Admin upload product images" on storage.objects;
+drop policy if exists "Admin delete product images" on storage.objects;
 
 -- Anyone can view images (needed so photos show up on the public storefront)
 create policy "Public read product images"

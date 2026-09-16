@@ -63,6 +63,9 @@ export default function AdminProductsPage() {
                   <td className="py-3 text-ink">{totalStock}</td>
                   <td className="py-3 capitalize text-graphite">{p.status.replace("_", " ")}</td>
                   <td className="py-3 text-right">
+                    <a href={`/admin/products/${p.id}/edit`} className="mr-4 text-graphite hover:text-ink">
+                      Edit
+                    </a>
                     <button onClick={() => handleDelete(p.id)} className="text-graphite hover:text-rust">
                       Delete
                     </button>

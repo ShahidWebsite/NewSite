@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import PresetSelect from "@/components/admin/PresetSelect";
+import { FINISH_OPTIONS, SIZE_OPTIONS, MATERIAL_OPTIONS, WEIGHT_UNIT_OPTIONS } from "@/lib/constants";
 
 type VariantRow = { finish: string; size: string; price: string; stock: string; sku: string };
 type SpecRow = { key: string; value: string };
@@ -22,7 +24,12 @@ export default function NewProductPage() {
   const [description, setDescription] = useState("");
   const [basePrice, setBasePrice] = useState("");
   const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
-  const [specs, setSpecs] = useState<SpecRow[]>([{ key: "Material", value: "" }]);
+  const [material, setMaterial] = useState("");
+  const [weight, setWeight] = useState("");
+  const [weightUnit, setWeightUnit] = useState("g");
+  const [specs, setSpecs] = useState<SpecRow[]>([]);
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
   const [variants, setVariants] = useState<VariantRow[]>([
     { finish: "", size: "", price: "", stock: "", sku: "" },
   ]);
@@ -32,6 +39,23 @@ export default function NewProductPage() {
   useEffect(() => {
     supabase.from("categories").select("*").order("sort_order").then(({ data }) => setCategories(data ?? []));
   }, []);
+
+  async function handleAddCategory() {
+    if (!newCategoryName.trim()) return;
+    const { data, error } = await supabase
+      .from("categories")
+      .insert({ name: newCategoryName.trim(), slug: slugify(newCategoryName) })
+      .select()
+      .single();
+    if (error) {
+      setError(`Could not add category: ${error.message}`);
+      return;
+    }
+    setCategories((prev) => [...prev, data]);
+    setCategoryId(data.id);
+    setNewCategoryName("");
+    setAddingCategory(false);
+  }
 
   function updateVariant(i: number, field: keyof VariantRow, value: string) {
     setVariants((prev) => prev.map((v, idx) => (idx === i ? { ...v, [field]: value } : v)));
@@ -98,9 +122,12 @@ export default function NewProductPage() {
     setError(null);
 
     try {
-      const specsObject = Object.fromEntries(
-        specs.filter((s) => s.key.trim() && s.value.trim()).map((s) => [s.key.trim(), s.value.trim()])
-      );
+      const specsObject: Record<string, string> = {};
+      if (material.trim()) specsObject["Material"] = material.trim();
+      if (weight.trim()) specsObject["Weight"] = `${weight.trim()}${weightUnit}`;
+      for (const s of specs) {
+        if (s.key.trim() && s.value.trim()) specsObject[s.key.trim()] = s.value.trim();
+      }
 
       const { data: product, error: productError } = await supabase
         .from("products")
@@ -167,6 +194,7 @@ export default function NewProductPage() {
       router.push("/admin/products");
     } catch (err: any) {
       setError(err.message || "Something went wrong saving this product.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setSaving(false);
     }
@@ -192,6 +220,30 @@ export default function NewProductPage() {
               ))}
             </select>
           </label>
+          {addingCategory ? (
+            <div className="flex gap-2">
+              <input
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="New category name"
+                className="flex-1 border border-nickel/50 bg-transparent px-3 py-2 font-body text-sm text-ink"
+              />
+              <button type="button" onClick={handleAddCategory} className="bg-ink px-3 py-2 font-body text-sm text-stone">
+                Add
+              </button>
+              <button type="button" onClick={() => setAddingCategory(false)} className="font-body text-sm text-graphite">
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAddingCategory(true)}
+              className="font-body text-sm text-graphite hover:text-ink"
+            >
+              + Add a new category
+            </button>
+          )}
           <label className="block">
             <span className="font-body text-sm text-graphite">Description</span>
             <textarea
@@ -236,35 +288,63 @@ export default function NewProductPage() {
           </p>
         </div>
 
-        <div>
-          <p className="font-body text-sm text-graphite">Specifications</p>
-          {specs.map((spec, i) => (
-            <div key={i} className="mt-2 flex gap-2">
+        <div className="space-y-4">
+          <div>
+            <p className="font-body text-sm text-graphite">Material</p>
+            <PresetSelect options={MATERIAL_OPTIONS} value={material} onChange={setMaterial} placeholder="Select material…" />
+          </div>
+          <div>
+            <p className="font-body text-sm text-graphite">Weight</p>
+            <div className="flex gap-2">
               <input
-                value={spec.key}
-                onChange={(e) =>
-                  setSpecs((prev) => prev.map((s, idx) => (idx === i ? { ...s, key: e.target.value } : s)))
-                }
-                placeholder="Spec name (e.g. Material)"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                type="number"
+                placeholder="e.g. 85"
                 className="flex-1 border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
               />
-              <input
-                value={spec.value}
-                onChange={(e) =>
-                  setSpecs((prev) => prev.map((s, idx) => (idx === i ? { ...s, value: e.target.value } : s)))
-                }
-                placeholder="Value (e.g. Zinc alloy)"
-                className="flex-1 border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
-              />
+              <select
+                value={weightUnit}
+                onChange={(e) => setWeightUnit(e.target.value)}
+                className="border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
+              >
+                {WEIGHT_UNIT_OPTIONS.map((u) => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </select>
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => setSpecs((prev) => [...prev, { key: "", value: "" }])}
-            className="mt-2 font-body text-sm text-graphite hover:text-ink"
-          >
-            + Add another spec
-          </button>
+          </div>
+
+          <div>
+            <p className="font-body text-sm text-graphite">Other specs (optional)</p>
+            {specs.map((spec, i) => (
+              <div key={i} className="mt-2 flex gap-2">
+                <input
+                  value={spec.key}
+                  onChange={(e) =>
+                    setSpecs((prev) => prev.map((s, idx) => (idx === i ? { ...s, key: e.target.value } : s)))
+                  }
+                  placeholder="Spec name (e.g. Hole spacing)"
+                  className="flex-1 border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
+                />
+                <input
+                  value={spec.value}
+                  onChange={(e) =>
+                    setSpecs((prev) => prev.map((s, idx) => (idx === i ? { ...s, value: e.target.value } : s)))
+                  }
+                  placeholder="Value"
+                  className="flex-1 border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
+                />
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setSpecs((prev) => [...prev, { key: "", value: "" }])}
+              className="mt-2 font-body text-sm text-graphite hover:text-ink"
+            >
+              + Add another spec
+            </button>
+          </div>
         </div>
 
         <div>
@@ -274,17 +354,17 @@ export default function NewProductPage() {
           <div className="mt-3 space-y-3">
             {variants.map((v, i) => (
               <div key={i} className="grid grid-cols-5 gap-2 border border-nickel/20 p-3">
-                <input
+                <PresetSelect
+                  options={FINISH_OPTIONS}
                   value={v.finish}
-                  onChange={(e) => updateVariant(i, "finish", e.target.value)}
-                  placeholder="Finish (e.g. Matte Black)"
-                  className="border border-nickel/50 bg-transparent px-2 py-1.5 font-body text-sm text-ink"
+                  onChange={(val) => updateVariant(i, "finish", val)}
+                  placeholder="Finish"
                 />
-                <input
+                <PresetSelect
+                  options={SIZE_OPTIONS}
                   value={v.size}
-                  onChange={(e) => updateVariant(i, "size", e.target.value)}
-                  placeholder="Size (e.g. 128mm)"
-                  className="border border-nickel/50 bg-transparent px-2 py-1.5 font-body text-sm text-ink"
+                  onChange={(val) => updateVariant(i, "size", val)}
+                  placeholder="Size"
                 />
                 <input
                   value={v.price}
@@ -321,7 +401,12 @@ export default function NewProductPage() {
           </button>
         </div>
 
-        {error && <p className="font-body text-sm text-rust">{error}</p>}
+        {error && (
+          <div className="border-2 border-rust bg-rust/10 p-4">
+            <p className="font-body text-sm font-medium text-rust">Could not save this product:</p>
+            <p className="mt-1 font-body text-sm text-rust">{error}</p>
+          </div>
+        )}
 
         <button
           type="submit"

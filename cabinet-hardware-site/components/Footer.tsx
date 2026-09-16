@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid gap-10 md:grid-cols-3">
           <div>
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Shahid Iqbal & Co logo" className="h-10 w-10" />
+              <img src="/logo.png?v=2" alt="Shahid Iqbal & Co logo" className="h-10 w-10" />
               <p className="font-display text-xl">Shahid Iqbal &amp; Co</p>
             </div>
             <p className="mt-3 max-w-prose font-body text-sm text-stone/70">

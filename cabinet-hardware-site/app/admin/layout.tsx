@@ -34,6 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="mt-6 space-y-2 font-body text-sm">
           <AdminLink href="/admin" label="Dashboard" />
           <AdminLink href="/admin/products" label="Products" />
+          <AdminLink href="/admin/categories" label="Categories" />
           <AdminLink href="/admin/orders" label="Orders" />
         </nav>
         <button

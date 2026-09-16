@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Shahid Iqbal & Co — Dream Hardware at your Door Step",
+  title: "Shahid Iqbal & Co (Cabinet Handles & Knobs)",
   description:
     "Door handles, cabinet handles, knobs, and furniture pulls, specialized in brass. Based in Lahore — order online with bank transfer and track your delivery.",
 };
