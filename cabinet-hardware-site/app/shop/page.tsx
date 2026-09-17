@@ -1,6 +1,9 @@
 import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/ProductCard";
+import SortSelect from "@/components/SortSelect";
 import { Product } from "@/lib/types";
+
+const PAGE_SIZE = 12;
 
 async function getCategories() {
   const { data } = await supabase.from("categories").select("*").order("sort_order");
@@ -59,7 +62,14 @@ async function getProductIdsMatchingVariantFilters(colorValue?: string, sizeValu
   return Array.from(new Set((variants ?? []).map((v) => v.product_id)));
 }
 
-async function getProducts(categorySlug?: string, colorValue?: string, sizeValue?: string): Promise<Product[]> {
+async function getProducts(
+  categorySlug?: string,
+  colorValue?: string,
+  sizeValue?: string,
+  searchTerm?: string,
+  sort?: string,
+  limit?: number
+): Promise<{ products: Product[]; hasMore: boolean }> {
   let categoryId: string | undefined;
   if (categorySlug) {
     const { data } = await supabase.from("categories").select("id").eq("slug", categorySlug).single();
@@ -67,21 +77,34 @@ async function getProducts(categorySlug?: string, colorValue?: string, sizeValue
   }
 
   const matchingProductIds = await getProductIdsMatchingVariantFilters(colorValue, sizeValue);
-  if (matchingProductIds !== null && matchingProductIds.length === 0) return []; // filters applied, nothing matched
+  if (matchingProductIds !== null && matchingProductIds.length === 0) return { products: [], hasMore: false };
+
+  const effectiveLimit = limit ?? PAGE_SIZE;
 
   let query = supabase
     .from("products")
     .select("*, product_images(*), product_variants(*, variant_attribute_values(attribute_value_id))")
-    .eq("status", "active")
-    .order("created_at", { ascending: false });
+    .eq("status", "active");
 
   if (categoryId) query = query.eq("category_id", categoryId);
   if (matchingProductIds !== null) query = query.in("id", matchingProductIds);
+  if (searchTerm) query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+
+  if (sort === "price_asc") query = query.order("base_price", { ascending: true });
+  else if (sort === "price_desc") query = query.order("base_price", { ascending: false });
+  else query = query.order("created_at", { ascending: false });
+
+  // Fetch one extra row so we know whether a "Load more" link is needed,
+  // without a separate count() query.
+  query = query.range(0, effectiveLimit);
 
   const { data } = await query;
-  if (!data) return [];
+  if (!data) return { products: [], hasMore: false };
 
-  return data.map((p: any) => ({
+  const hasMore = data.length > effectiveLimit;
+  const page = data.slice(0, effectiveLimit);
+
+  const products = page.map((p: any) => ({
     ...p,
     images: (p.product_images ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order),
     variants: (p.product_variants ?? []).map((v: any) => ({
@@ -89,17 +112,21 @@ async function getProducts(categorySlug?: string, colorValue?: string, sizeValue
       attribute_value_ids: (v.variant_attribute_values ?? []).map((j: any) => j.attribute_value_id),
     })),
   }));
+
+  return { products, hasMore };
 }
 
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: { category?: string; color?: string; size?: string };
+  searchParams: { category?: string; color?: string; size?: string; q?: string; sort?: string; limit?: string };
 }) {
-  const [categories, filterOptions, products] = await Promise.all([
+  const limit = Math.max(PAGE_SIZE, Number(searchParams.limit) || PAGE_SIZE);
+
+  const [categories, filterOptions, { products, hasMore }] = await Promise.all([
     getCategories(),
     getFilterOptions(),
-    getProducts(searchParams.category, searchParams.color, searchParams.size),
+    getProducts(searchParams.category, searchParams.color, searchParams.size, searchParams.q, searchParams.sort, limit),
   ]);
 
   const activeCategory = categories.find((c) => c.slug === searchParams.category);
@@ -113,6 +140,29 @@ export default async function ShopPage({
     if (category) params.set("category", category);
     if (color) params.set("color", color);
     if (size) params.set("size", size);
+    if (searchParams.q) params.set("q", searchParams.q);
+    if (searchParams.sort) params.set("sort", searchParams.sort);
+    const qs = params.toString();
+    return qs ? `/shop?${qs}` : "/shop";
+  }
+
+  function loadMoreHref() {
+    const params = new URLSearchParams();
+    if (searchParams.category) params.set("category", searchParams.category);
+    if (searchParams.color) params.set("color", searchParams.color);
+    if (searchParams.size) params.set("size", searchParams.size);
+    if (searchParams.q) params.set("q", searchParams.q);
+    if (searchParams.sort) params.set("sort", searchParams.sort);
+    params.set("limit", String(limit + PAGE_SIZE));
+    return `/shop?${params.toString()}`;
+  }
+
+  function filterHrefWithoutQuery() {
+    const params = new URLSearchParams();
+    if (searchParams.category) params.set("category", searchParams.category);
+    if (searchParams.color) params.set("color", searchParams.color);
+    if (searchParams.size) params.set("size", searchParams.size);
+    if (searchParams.sort) params.set("sort", searchParams.sort);
     const qs = params.toString();
     return qs ? `/shop?${qs}` : "/shop";
   }
@@ -120,7 +170,11 @@ export default async function ShopPage({
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
       <h1 className="font-display text-4xl text-ink">
-        {activeCategory ? activeCategory.name : "All products"}
+        {searchParams.q
+          ? `Results for "${searchParams.q}"`
+          : activeCategory
+          ? activeCategory.name
+          : "All products"}
       </h1>
 
       <div className="mt-8 grid gap-8 md:grid-cols-[200px_1fr]">
@@ -197,16 +251,43 @@ export default async function ShopPage({
 
         {/* Results */}
         <div>
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <p className="font-body text-sm text-graphite">
+              {searchParams.q && (
+                <>
+                  {products.length === 0 ? "No matches" : `Showing results`} for &ldquo;{searchParams.q}&rdquo;
+                  {" · "}
+                  <a href={filterHrefWithoutQuery()} className="underline hover:text-ink">
+                    Clear search
+                  </a>
+                </>
+              )}
+            </p>
+            <SortSelect />
+          </div>
+
           {products.length === 0 ? (
             <p className="font-body text-graphite">
               No products match these filters — try clearing one, or browse all products.
             </p>
           ) : (
-            <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+                {products.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+              {hasMore && (
+                <div className="mt-10 text-center">
+                  <a
+                    href={loadMoreHref()}
+                    className="inline-block border border-ink px-6 py-2 font-body text-sm text-ink hover:bg-ink hover:text-stone"
+                  >
+                    Load more
+                  </a>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

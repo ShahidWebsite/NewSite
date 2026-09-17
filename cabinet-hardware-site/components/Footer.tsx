@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="mt-24 bg-blacknickel text-stone">
       <div className="mx-auto max-w-6xl px-6 py-14">
-        <div className="grid gap-10 md:grid-cols-3">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
               <img src="/logo.png?v=2" alt="Shahid Iqbal & Co logo" className="h-10 w-10" />
@@ -21,6 +21,17 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><Link href="/shop" className="hover:text-brass">All products</Link></li>
               <li><Link href="/track-order" className="hover:text-brass">Track an order</Link></li>
+              <li><Link href="/about" className="hover:text-brass">About us</Link></li>
+            </ul>
+          </div>
+
+          <div className="font-body text-sm">
+            <p className="mb-3 text-stone/50">Policies</p>
+            <ul className="space-y-2">
+              <li><Link href="/shipping" className="hover:text-brass">Shipping</Link></li>
+              <li><Link href="/returns" className="hover:text-brass">Returns &amp; Exchanges</Link></li>
+              <li><Link href="/privacy" className="hover:text-brass">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-brass">Terms of Service</Link></li>
             </ul>
           </div>
 

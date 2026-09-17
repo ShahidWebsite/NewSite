@@ -2,12 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
 
 export default function Header() {
   const { lines } = useCart();
+  const router = useRouter();
   const itemCount = lines.reduce((sum, l) => sum + l.quantity, 0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = query.trim();
+    setSearchOpen(false);
+    setMenuOpen(false);
+    router.push(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
+  }
 
   return (
     <header className="border-b border-nickel/30">
@@ -27,6 +39,15 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setSearchOpen((v) => !v)}
+            className="font-body text-sm text-graphite hover:text-ink"
+            aria-label="Toggle search"
+            aria-expanded={searchOpen}
+          >
+            Search
+          </button>
           <Link
             href="/cart"
             className="font-body text-sm text-ink underline decoration-nickel decoration-1 underline-offset-4 hover:decoration-brass"
@@ -46,6 +67,19 @@ export default function Header() {
           </button>
         </div>
       </div>
+
+      {searchOpen && (
+        <form onSubmit={handleSearch} className="border-t border-nickel/20 px-6 py-4">
+          <input
+            type="text"
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search handles, knobs, pulls…"
+            className="w-full max-w-md border border-nickel/40 px-3 py-2 font-body text-sm text-ink outline-none focus:border-ink"
+          />
+        </form>
+      )}
 
       {menuOpen && (
         <nav className="flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite md:hidden">

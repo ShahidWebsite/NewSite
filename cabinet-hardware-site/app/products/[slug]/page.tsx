@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import VariantSelector from "@/components/VariantSelector";
+import ProductGallery from "@/components/ProductGallery";
+import ProductReviews from "@/components/ProductReviews";
 import { Attribute, Product } from "@/lib/types";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.siqbalhwc.com";
@@ -108,20 +110,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
       <div className="grid gap-12 md:grid-cols-2">
-        <div className="aspect-square bg-nickel/10">
-          {product.images[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.images[0].url}
-              alt={product.name}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center font-display text-2xl italic text-nickel">
-              {product.name}
-            </div>
-          )}
-        </div>
+        <ProductGallery images={product.images} productName={product.name} />
 
         <div>
           <h1 className="font-display text-4xl text-ink">{product.name}</h1>
@@ -155,6 +144,8 @@ export default async function ProductPage({ params }: { params: { slug: string }
           )}
         </div>
       </div>
+
+      <ProductReviews productId={product.id} />
     </div>
   );
 }

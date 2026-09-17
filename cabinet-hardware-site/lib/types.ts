@@ -55,6 +55,16 @@ export type CartLine = {
   imageUrl: string | null;
 };
 
+export type Review = {
+  id: string;
+  product_id: string;
+  customer_name: string;
+  rating: number;
+  body: string;
+  approved: boolean;
+  created_at: string;
+};
+
 export type BankSettings = {
   account_title: string;
   bank_name: string;

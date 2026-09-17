@@ -36,6 +36,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <AdminLink href="/admin/products" label="Products" />
           <AdminLink href="/admin/categories" label="Categories" />
           <AdminLink href="/admin/orders" label="Orders" />
+          <AdminLink href="/admin/reviews" label="Reviews" />
         </nav>
         <button
           onClick={async () => {
