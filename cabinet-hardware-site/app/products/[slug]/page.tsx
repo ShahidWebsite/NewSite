@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import VariantSelector from "@/components/VariantSelector";
 import { Attribute, Product } from "@/lib/types";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.siqbalhwc.com";
 
 async function getProduct(slug: string): Promise<{ product: Product; attributes: Attribute[] } | null> {
   const { data: product } = await supabase
@@ -51,13 +54,59 @@ async function getProduct(slug: string): Promise<{ product: Product; attributes:
   };
 }
 
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { data: product } = await supabase
+    .from("products")
+    .select("name, description, seo_title, seo_description, product_images(url)")
+    .eq("slug", params.slug)
+    .single();
+
+  if (!product) return {};
+
+  const title = product.seo_title || `${product.name} — Shahid Iqbal & Co`;
+  const description = product.seo_description || product.description || undefined;
+  const image = (product as any).product_images?.[0]?.url;
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, images: image ? [image] : undefined },
+  };
+}
+
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const result = await getProduct(params.slug);
   if (!result) notFound();
   const { product, attributes } = result;
 
+  const totalStock = product.variants.reduce((sum, v) => sum + v.stock_qty, 0);
+  const priceRange = product.variants.length
+    ? [Math.min(...product.variants.map((v) => v.price)), Math.max(...product.variants.map((v) => v.price))]
+    : [product.base_price, product.base_price];
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description || product.name,
+    image: product.images.map((img) => img.url),
+    brand: { "@type": "Brand", name: "Shahid Iqbal & Co" },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "PKR",
+      lowPrice: priceRange[0],
+      highPrice: priceRange[1],
+      availability: totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      url: `${SITE_URL}/products/${product.slug}`,
+    },
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <div className="grid gap-12 md:grid-cols-2">
         <div className="aspect-square bg-nickel/10">
           {product.images[0] ? (

@@ -28,10 +28,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!checked) return <div className="p-10 font-body text-graphite">Checking session…</div>;
 
   return (
-    <div className="mx-auto flex max-w-6xl gap-10 px-6 py-10">
-      <aside className="w-48 flex-shrink-0">
+    <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 sm:flex-row sm:gap-10">
+      <aside className="w-full flex-shrink-0 sm:w-48">
         <p className="font-display text-xl text-ink">Admin</p>
-        <nav className="mt-6 space-y-2 font-body text-sm">
+        <nav className="mt-4 flex gap-4 font-body text-sm sm:mt-6 sm:flex-col sm:gap-2">
           <AdminLink href="/admin" label="Dashboard" />
           <AdminLink href="/admin/products" label="Products" />
           <AdminLink href="/admin/categories" label="Categories" />

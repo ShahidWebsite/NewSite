@@ -45,6 +45,8 @@ export default function EditProductPage() {
   const [variants, setVariants] = useState<VariantRow[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -109,6 +111,23 @@ export default function EditProductPage() {
 
   function updateVariant(i: number, field: keyof VariantRow, value: string | boolean) {
     setVariants((prev) => prev.map((v, idx) => (idx === i ? { ...v, [field]: value } : v)));
+  }
+
+  async function handleAddCategory() {
+    if (!newCategoryName.trim()) return;
+    const { data, error } = await supabase
+      .from("categories")
+      .insert({ name: newCategoryName.trim(), slug: slugify(newCategoryName) })
+      .select()
+      .single();
+    if (error) {
+      setError(`Could not add category: ${error.message}`);
+      return;
+    }
+    setCategories((prev) => [...prev, data]);
+    setCategoryId(data.id);
+    setNewCategoryName("");
+    setAddingCategory(false);
   }
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -290,6 +309,30 @@ export default function EditProductPage() {
               ))}
             </select>
           </label>
+          {addingCategory ? (
+            <div className="flex gap-2">
+              <input
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="New category name"
+                className="flex-1 border border-nickel/50 bg-transparent px-3 py-2 font-body text-sm text-ink"
+              />
+              <button type="button" onClick={handleAddCategory} className="bg-ink px-3 py-2 font-body text-sm text-stone">
+                Add
+              </button>
+              <button type="button" onClick={() => setAddingCategory(false)} className="font-body text-sm text-graphite">
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAddingCategory(true)}
+              className="font-body text-sm text-graphite hover:text-ink"
+            >
+              + Add a new category
+            </button>
+          )}
           <label className="block">
             <span className="font-body text-sm text-graphite">Description</span>
             <textarea
@@ -383,7 +426,7 @@ export default function EditProductPage() {
           </p>
           <div className="mt-3 space-y-3">
             {variants.map((v, i) => (
-              <div key={i} className={`grid grid-cols-6 gap-2 border p-3 ${v.markedForDelete ? "border-rust/40 opacity-50" : "border-nickel/20"}`}>
+              <div key={i} className={`grid grid-cols-2 gap-2 border p-3 sm:grid-cols-6 ${v.markedForDelete ? "border-rust/40 opacity-50" : "border-nickel/20"}`}>
                 <PresetSelect options={FINISH_OPTIONS} value={v.finish} onChange={(val) => updateVariant(i, "finish", val)} placeholder="Finish" />
                 <PresetSelect options={SIZE_OPTIONS} value={v.size} onChange={(val) => updateVariant(i, "size", val)} placeholder="Size" />
                 <input

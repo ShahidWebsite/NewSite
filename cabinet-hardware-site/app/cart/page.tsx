@@ -27,7 +27,7 @@ export default function CartPage() {
 
       <div className="mt-8 divide-y divide-nickel/20">
         {lines.map((line) => (
-          <div key={line.variantId} className="flex items-center gap-4 py-5">
+          <div key={line.variantId} className="flex flex-wrap items-center gap-4 py-5">
             <div className="h-20 w-20 flex-shrink-0 bg-nickel/10">
               {line.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element

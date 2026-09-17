@@ -219,6 +219,11 @@ export default function NewProductPage() {
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
+            {categories.length === 0 && (
+              <p className="mt-1 font-body text-xs text-graphite">
+                No categories yet — add your first one below.
+              </p>
+            )}
           </label>
           {addingCategory ? (
             <div className="flex gap-2">
@@ -353,7 +358,7 @@ export default function NewProductPage() {
           </p>
           <div className="mt-3 space-y-3">
             {variants.map((v, i) => (
-              <div key={i} className="grid grid-cols-5 gap-2 border border-nickel/20 p-3">
+              <div key={i} className="grid grid-cols-2 gap-2 border border-nickel/20 p-3 sm:grid-cols-5">
                 <PresetSelect
                   options={FINISH_OPTIONS}
                   value={v.finish}

@@ -70,16 +70,16 @@ export default async function HomePage() {
           <div className="grid grid-cols-3 gap-4">
             {[
               { name: "Matte Black", hex: "#1C1B19" },
-              { name: "Brushed Brass", hex: "#A9832E" },
-              { name: "Brushed Nickel", hex: "#9B9992" },
+              { name: "Golden", hex: "#A9832E" },
+              { name: "Chrome", hex: "#9B9992" },
             ].map((finish) => (
-              <div key={finish.name} className="space-y-3">
+              <Link key={finish.name} href={`/shop?color=${encodeURIComponent(finish.name)}`} className="group space-y-3">
                 <div
-                  className="aspect-square rounded-full border-2 border-stone/40 ring-1 ring-black/20"
+                  className="aspect-square rounded-full border-2 border-stone/40 ring-1 ring-black/20 transition-transform group-hover:scale-105"
                   style={{ backgroundColor: finish.hex }}
                 />
-                <p className="text-center font-body text-xs text-stone/60">{finish.name}</p>
-              </div>
+                <p className="text-center font-body text-xs text-stone/60 group-hover:text-stone">{finish.name}</p>
+              </Link>
             ))}
           </div>
         </div>
