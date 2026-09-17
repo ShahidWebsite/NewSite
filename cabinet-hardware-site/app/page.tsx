@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/ProductCard";
 import Testimonials from "@/components/Testimonials";
+import Reveal from "@/components/Reveal";
 import { Product } from "@/lib/types";
 
 // Without this, Next.js bakes the homepage into a static snapshot at build
@@ -89,19 +90,22 @@ export default async function HomePage() {
       {/* Category tiles */}
       {categories.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="font-display text-3xl text-ink">Shop by category</h2>
+          <Reveal>
+            <h2 className="font-display text-3xl text-ink">Shop by category</h2>
+          </Reveal>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/shop?category=${cat.slug}`}
-                className="group flex items-center justify-between border border-nickel/30 px-6 py-8 transition-colors hover:border-ink"
-              >
-                <span className="font-display text-xl text-ink">{cat.name}</span>
-                <span className="font-body text-graphite transition-transform group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
+            {categories.map((cat, i) => (
+              <Reveal key={cat.id} delay={i * 60}>
+                <Link
+                  href={`/shop?category=${cat.slug}`}
+                  className="group flex items-center justify-between border border-nickel/30 px-6 py-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-brass hover:shadow-[0_10px_25px_-15px_rgba(42,40,37,0.3)]"
+                >
+                  <span className="font-display text-xl text-ink">{cat.name}</span>
+                  <span className="font-body text-graphite transition-transform duration-300 group-hover:translate-x-1 group-hover:text-brass">
+                    →
+                  </span>
+                </Link>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -110,43 +114,85 @@ export default async function HomePage() {
       {/* Featured products */}
       {products.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 py-20">
-          <div className="flex items-baseline justify-between">
-            <h2 className="font-display text-3xl text-ink">Recently added</h2>
-            <Link href="/shop" className="font-body text-sm text-graphite hover:text-ink">
-              View all
-            </Link>
-          </div>
+          <Reveal>
+            <div className="flex items-baseline justify-between">
+              <h2 className="font-display text-3xl text-ink">Recently added</h2>
+              <Link href="/shop" className="font-body text-sm text-graphite hover:text-brass">
+                View all
+              </Link>
+            </div>
+          </Reveal>
           <div className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-4">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {products.map((p, i) => (
+              <Reveal key={p.id} delay={i * 60}>
+                <ProductCard product={p} />
+              </Reveal>
             ))}
           </div>
         </section>
       )}
 
       {/* Trust / specs section */}
-      <section className="bg-ink/[0.03] py-20">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 md:grid-cols-3">
-          <div>
-            <p className="font-display text-xl text-ink">Exact specs, every listing</p>
-            <p className="mt-3 font-body text-sm text-graphite">
-              Hole spacing, material, and weight are listed on every product
-              — no guessing before your cabinets arrive.
-            </p>
-          </div>
-          <div>
-            <p className="font-display text-xl text-ink">Bank transfer accepted</p>
-            <p className="mt-3 font-body text-sm text-graphite">
-              Pay by direct bank transfer with your order number as
-              reference — details are shown at checkout.
-            </p>
-          </div>
-          <div>
-            <p className="font-display text-xl text-ink">Track your order</p>
-            <p className="mt-3 font-body text-sm text-graphite">
-              Look up your order anytime with your order number and email
-              to see its current status.
-            </p>
+      <section className="border-y border-nickel/20 bg-ink/[0.03] py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              {
+                icon: (
+                  <path
+                    d="M4 15L15 4M8 16l-4-4M9 20l3-3M4 11l4 4m5-11l4 4m-8 4l4 4"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                ),
+                title: "Exact specs, every listing",
+                body: "Hole spacing, material, and weight are listed on every product — no guessing before your cabinets arrive.",
+              },
+              {
+                icon: (
+                  <>
+                    <path d="M3 9l9-5 9 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M5 9v9m4-9v9m4-9v9m4-9v9M3 20h18"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                    />
+                  </>
+                ),
+                title: "Bank transfer accepted",
+                body: "Pay by direct bank transfer with your order number as reference — details are shown at checkout.",
+              },
+              {
+                icon: (
+                  <>
+                    <path
+                      d="M12 21s7-6.1 7-11.5A7 7 0 105 9.5C5 14.9 12 21 12 21z"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinejoin="round"
+                    />
+                    <circle cx="12" cy="9.5" r="2.3" stroke="currentColor" strokeWidth="1.4" />
+                  </>
+                ),
+                title: "Track your order",
+                body: "Look up your order anytime with your order number and email to see its current status.",
+              },
+            ].map((item, i) => (
+              <Reveal key={item.title} delay={i * 100}>
+                <div className="group h-full border border-transparent px-2 py-2 transition-colors duration-300 hover:border-nickel/20">
+                  <span className="flex h-11 w-11 items-center justify-center border border-brass/40 text-brass transition-colors duration-300 group-hover:bg-brass group-hover:text-stone">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      {item.icon}
+                    </svg>
+                  </span>
+                  <p className="mt-4 font-display text-xl text-ink">{item.title}</p>
+                  <p className="mt-3 font-body text-sm text-graphite">{item.body}</p>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
