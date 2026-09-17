@@ -3,6 +3,11 @@ import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/ProductCard";
 import { Product } from "@/lib/types";
 
+// Without this, Next.js bakes the homepage into a static snapshot at build
+// time — so new products/photos added later through /admin would never show
+// up here until the next deploy. This makes it fetch fresh data every visit.
+export const dynamic = "force-dynamic";
+
 async function getFeaturedProducts(): Promise<Product[]> {
   const { data } = await supabase
     .from("products")
