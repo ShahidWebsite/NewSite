@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/ProductCard";
+import Testimonials from "@/components/Testimonials";
 import { Product } from "@/lib/types";
 
 // Without this, Next.js bakes the homepage into a static snapshot at build
@@ -149,6 +150,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <Testimonials />
     </>
   );
 }

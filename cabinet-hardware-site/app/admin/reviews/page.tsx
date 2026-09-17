@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 
 type ReviewRow = {
   id: string;
+  product_id: string | null;
   customer_name: string;
   rating: number;
   body: string;
@@ -89,7 +90,7 @@ export default function AdminReviewsPage() {
                   ))}
                 </p>
                 <span className="text-xs text-graphite">
-                  {r.products ? r.products.name : "(deleted product)"}
+                  {r.products ? r.products.name : r.product_id ? "(deleted product)" : "General testimonial"}
                 </span>
               </div>
               <p className="mt-1 text-graphite">{r.body}</p>

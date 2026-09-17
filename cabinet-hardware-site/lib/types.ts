@@ -57,7 +57,7 @@ export type CartLine = {
 
 export type Review = {
   id: string;
-  product_id: string;
+  product_id: string | null;
   customer_name: string;
   rating: number;
   body: string;
