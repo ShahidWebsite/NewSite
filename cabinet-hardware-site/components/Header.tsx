@@ -39,15 +39,52 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={() => setSearchOpen((v) => !v)}
-            className="font-body text-sm text-graphite hover:text-ink"
-            aria-label="Toggle search"
-            aria-expanded={searchOpen}
-          >
-            Search
-          </button>
+          {searchOpen ? (
+            <form onSubmit={handleSearch} className="flex items-center gap-2">
+              <input
+                type="text"
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    setSearchOpen(false);
+                    setQuery("");
+                  }
+                }}
+                onBlur={() => {
+                  if (!query.trim()) setSearchOpen(false);
+                }}
+                placeholder="Search…"
+                className="w-32 border-b border-nickel/50 bg-transparent px-0.5 py-1 font-body text-sm text-ink outline-none placeholder:text-graphite/60 focus:border-ink sm:w-48"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchOpen(false);
+                  setQuery("");
+                }}
+                aria-label="Close search"
+                className="text-graphite hover:text-ink"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="1.3" />
+                </svg>
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="text-graphite hover:text-ink"
+              aria-label="Open search"
+            >
+              <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+                <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3" />
+                <path d="M11.5 11.5L15.5 15.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
           <Link
             href="/cart"
             className="font-body text-sm text-ink underline decoration-nickel decoration-1 underline-offset-4 hover:decoration-brass"
@@ -67,19 +104,6 @@ export default function Header() {
           </button>
         </div>
       </div>
-
-      {searchOpen && (
-        <form onSubmit={handleSearch} className="border-t border-nickel/20 px-6 py-4">
-          <input
-            type="text"
-            autoFocus
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search handles, knobs, pulls…"
-            className="w-full max-w-md border border-nickel/40 px-3 py-2 font-body text-sm text-ink outline-none focus:border-ink"
-          />
-        </form>
-      )}
 
       {menuOpen && (
         <nav className="flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite md:hidden">
