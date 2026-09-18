@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cart-context";
-import { BankSettings } from "@/lib/types";
+import { BankAccount } from "@/lib/types";
 
 export default function CheckoutPage() {
   const { lines, subtotal, clear } = useCart();
@@ -12,7 +12,8 @@ export default function CheckoutPage() {
   const [confirmation, setConfirmation] = useState<{
     orderNumber: string;
     total: number;
-    bankSettings: BankSettings;
+    bankAccounts: BankAccount[];
+    instructions: string;
   } | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -68,16 +69,31 @@ export default function CheckoutPage() {
           this to track your order later.
         </p>
 
-        <div className="mt-8 border border-nickel/30 p-6">
-          <p className="font-body text-sm text-graphite">Complete your payment by bank transfer</p>
-          <dl className="mt-4 space-y-2 font-body text-sm">
-            <Row label="Account title" value={confirmation.bankSettings.account_title} />
-            <Row label="Bank" value={confirmation.bankSettings.bank_name} />
-            <Row label="Account number" value={confirmation.bankSettings.account_number} />
-            <Row label="IFSC / Routing" value={confirmation.bankSettings.ifsc_or_routing} />
-            <Row label="Amount" value={`Rs. ${confirmation.total.toLocaleString()}`} />
-          </dl>
-          <p className="mt-4 font-body text-sm text-graphite">{confirmation.bankSettings.instructions}</p>
+        <div className="mt-8 space-y-4">
+          <p className="font-body text-sm text-graphite">
+            Complete your payment by bank transfer to any one of the accounts below
+          </p>
+          {confirmation.bankAccounts.length === 0 ? (
+            <p className="border border-nickel/30 p-6 font-body text-sm text-rust">
+              No bank account is set up yet — contact us on WhatsApp to arrange payment for
+              this order.
+            </p>
+          ) : (
+            confirmation.bankAccounts.map((acc) => (
+              <div key={acc.id} className="border border-nickel/30 p-6">
+                <p className="font-display text-lg text-ink">{acc.bank_name}</p>
+                <dl className="mt-3 space-y-2 font-body text-sm">
+                  <Row label="Account title" value={acc.account_title} />
+                  <Row label="Account number" value={acc.account_number} />
+                  {acc.ifsc_or_routing && <Row label="IBAN / Routing" value={acc.ifsc_or_routing} />}
+                </dl>
+              </div>
+            ))
+          )}
+          <div className="border-t border-nickel/20 pt-4">
+            <Row label="Amount to pay" value={`Rs. ${confirmation.total.toLocaleString()}`} />
+          </div>
+          <p className="font-body text-sm text-graphite">{confirmation.instructions}</p>
         </div>
 
         <Link

@@ -104,14 +104,18 @@ export async function POST(request: Request) {
       .eq("id", line.variantId);
   }
 
-  const { data: bankSettings } = await supabase
-    .from("bank_settings")
-    .select("account_title, bank_name, account_number, ifsc_or_routing, instructions")
-    .single();
+  const { data: bankAccounts } = await supabase
+    .from("bank_accounts")
+    .select("id, bank_name, account_title, account_number, ifsc_or_routing, sort_order, active")
+    .eq("active", true)
+    .order("sort_order");
+
+  const { data: bankSettings } = await supabase.from("bank_settings").select("instructions").single();
 
   return NextResponse.json({
     orderNumber: order.order_number,
     total: order.total,
-    bankSettings,
+    bankAccounts: bankAccounts ?? [],
+    instructions: bankSettings?.instructions ?? "Please use your Order Number as the payment reference.",
   });
 }

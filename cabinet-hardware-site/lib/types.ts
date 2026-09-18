@@ -72,3 +72,13 @@ export type BankSettings = {
   ifsc_or_routing: string;
   instructions: string;
 };
+
+export type BankAccount = {
+  id: string;
+  bank_name: string;
+  account_title: string;
+  account_number: string;
+  ifsc_or_routing: string;
+  sort_order: number;
+  active: boolean;
+};
