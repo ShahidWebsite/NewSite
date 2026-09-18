@@ -15,7 +15,8 @@ async function getFeaturedProducts(): Promise<Product[]> {
     .from("products")
     .select("*, product_images(*), product_variants(*, variant_attribute_values(attribute_value_id))")
     .eq("status", "active")
-    .limit(4);
+    .order("created_at", { ascending: false })
+    .limit(8);
 
   if (!data) return [];
 
