@@ -32,9 +32,14 @@ export default function AdminProductsPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="font-display text-3xl text-ink">Products</h1>
-        <Link href="/admin/products/new" className="bg-ink px-4 py-2 font-body text-sm text-stone hover:bg-brass">
-          Add product
-        </Link>
+        <div className="flex gap-3">
+          <Link href="/admin/products/import" className="border border-ink px-4 py-2 font-body text-sm text-ink hover:bg-ink hover:text-stone">
+            Import from Excel
+          </Link>
+          <Link href="/admin/products/new" className="bg-ink px-4 py-2 font-body text-sm text-stone hover:bg-brass">
+            Add product
+          </Link>
+        </div>
       </div>
 
       {loading ? (
