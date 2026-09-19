@@ -9,11 +9,17 @@ import Footer from "@/components/Footer";
 // to turn Google Analytics on. Until then this renders nothing, so it's
 // safe to ship even before the owner has a GA4 property set up.
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.siqbalhwc.com";
 
 export const metadata: Metadata = {
-  title: "Shahid Iqbal & Co (Cabinet Handles & Knobs)",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Shahid Iqbal & Co — Cabinet Handles & Knobs in Lahore",
+    template: "%s",
+  },
   description:
     "Door handles, cabinet handles, knobs, and furniture pulls, specialized in brass. Based in Lahore — order online with bank transfer and track your delivery.",
+  alternates: { canonical: "/" },
 };
 
 // LocalBusiness structured data — tells Google exactly who you are, where

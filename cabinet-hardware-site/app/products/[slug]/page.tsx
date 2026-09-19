@@ -8,10 +8,12 @@ import { Attribute, Product } from "@/lib/types";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.siqbalhwc.com";
 
-async function getProduct(slug: string): Promise<{ product: Product; attributes: Attribute[] } | null> {
+async function getProduct(
+  slug: string
+): Promise<{ product: Product; attributes: Attribute[]; category: { name: string; slug: string } | null } | null> {
   const { data: product } = await supabase
     .from("products")
-    .select("*, product_images(*), product_variants(*, variant_attribute_values(attribute_value_id))")
+    .select("*, product_images(*), product_variants(*, variant_attribute_values(attribute_value_id)), categories(name, slug)")
     .eq("slug", slug)
     .eq("status", "active")
     .single();
@@ -53,6 +55,9 @@ async function getProduct(slug: string): Promise<{ product: Product; attributes:
       variants,
     },
     attributes: Array.from(attributeMap.values()),
+    category: (product as any).categories
+      ? { name: (product as any).categories.name, slug: (product as any).categories.slug }
+      : null,
   };
 }
 
@@ -72,6 +77,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title,
     description,
+    alternates: { canonical: `${SITE_URL}/products/${params.slug}` },
     openGraph: { title, description, images: image ? [image] : undefined },
   };
 }
@@ -79,7 +85,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const result = await getProduct(params.slug);
   if (!result) notFound();
-  const { product, attributes } = result;
+  const { product, attributes, category } = result;
 
   const totalStock = product.variants.reduce((sum, v) => sum + v.stock_qty, 0);
   const priceRange = product.variants.length
@@ -103,12 +109,54 @@ export default async function ProductPage({ params }: { params: { slug: string }
     },
   };
 
+  const breadcrumbItems = [
+    { name: "Home", url: SITE_URL },
+    ...(category ? [{ name: category.name, url: `${SITE_URL}/shop?category=${category.slug}` }] : []),
+    { name: product.name, url: `${SITE_URL}/products/${product.slug}` },
+  ];
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
+      <nav aria-label="Breadcrumb" className="mb-6 font-body text-xs text-graphite">
+        <ol className="flex flex-wrap items-center gap-1">
+          <li>
+            <a href="/" className="hover:text-ink">Home</a>
+          </li>
+          {category && (
+            <>
+              <li aria-hidden="true">/</li>
+              <li>
+                <a href={`/shop?category=${category.slug}`} className="hover:text-ink">
+                  {category.name}
+                </a>
+              </li>
+            </>
+          )}
+          <li aria-hidden="true">/</li>
+          <li className="text-ink" aria-current="page">{product.name}</li>
+        </ol>
+      </nav>
+
       <div className="grid gap-12 md:grid-cols-2">
         <ProductGallery images={product.images} productName={product.name} />
 

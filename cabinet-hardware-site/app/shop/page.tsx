@@ -1,9 +1,59 @@
+import { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/ProductCard";
 import SortSelect from "@/components/SortSelect";
 import { Product } from "@/lib/types";
 
 const PAGE_SIZE = 12;
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.siqbalhwc.com";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: { category?: string; color?: string; size?: string; q?: string };
+}): Promise<Metadata> {
+  if (searchParams.q) {
+    return {
+      title: `Search: "${searchParams.q}" — Shahid Iqbal & Co`,
+      robots: { index: false }, // search-result pages shouldn't compete with real category pages
+    };
+  }
+
+  // A color/size filter on top of a category is a thin, ever-changing
+  // combination — index the category page itself, not every filter mix.
+  if (searchParams.color || searchParams.size) {
+    return { robots: { index: false } };
+  }
+
+  if (searchParams.category) {
+    const { data: category } = await supabase
+      .from("categories")
+      .select("name, slug")
+      .eq("slug", searchParams.category)
+      .maybeSingle();
+
+    if (category) {
+      const title = `${category.name} in Lahore — Buy Online | Shahid Iqbal & Co`;
+      const description = `Shop ${category.name.toLowerCase()} — brass, chrome, and matte black finishes in every standard size. Exact specs on every listing, bank transfer, delivery across Pakistan.`;
+      return {
+        title,
+        description,
+        alternates: { canonical: `${SITE_URL}/shop?category=${category.slug}` },
+        openGraph: { title, description },
+      };
+    }
+  }
+
+  const title = "Shop All Cabinet Handles & Knobs — Shahid Iqbal & Co";
+  const description =
+    "Browse our full range of cabinet handles, cabinet knobs, and drawer pulls — brass, chrome, and matte black finishes, every size specified. Based in Lahore, delivered across Pakistan.";
+  return {
+    title,
+    description,
+    alternates: { canonical: `${SITE_URL}/shop` },
+    openGraph: { title, description },
+  };
+}
 
 async function getCategories() {
   const { data } = await supabase.from("categories").select("*").order("sort_order");
