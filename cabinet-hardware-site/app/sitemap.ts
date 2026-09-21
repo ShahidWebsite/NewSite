@@ -1,19 +1,23 @@
 import { MetadataRoute } from "next";
 import { supabase } from "@/lib/supabase";
+import { SITE_URL } from "@/lib/seo";
 
-// Update this once your real domain (www.siqbalhwc.com) is connected in Vercel.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.siqbalhwc.com";
+// Rebuilt at most once an hour, so new products and guides reach Google without a redeploy.
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [{ data: products }, { data: categories }] = await Promise.all([
+  const [{ data: products }, { data: categories }, { data: posts }] = await Promise.all([
     supabase.from("products").select("slug, updated_at").eq("status", "active"),
     supabase.from("categories").select("slug"),
+    supabase.from("blog_posts").select("slug, updated_at, published_at").eq("published", true),
   ]);
 
+  // Only pages that should appear in Google. Utility pages (track-order, cart,
+  // checkout) are marked noindex, so they are deliberately left out.
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "daily", priority: 1 },
     { url: `${SITE_URL}/shop`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${SITE_URL}/track-order`, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/about`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/shipping`, changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/returns`, changeFrequency: "monthly", priority: 0.3 },
@@ -34,5 +38,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...categoryPages, ...productPages];
+  const blogPages: MetadataRoute.Sitemap = (posts ?? []).map((p) => ({
+    url: `${SITE_URL}/blog/${p.slug}`,
+    lastModified: new Date(p.updated_at || p.published_at || Date.now()),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...categoryPages, ...blogPages, ...productPages];
 }

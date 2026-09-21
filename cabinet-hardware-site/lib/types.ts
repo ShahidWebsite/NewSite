@@ -35,6 +35,9 @@ export type Product = {
   id: string;
   name: string;
   slug: string;
+  model_code?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
   description: string | null;
   specs: Record<string, string>;
   base_price: number;
@@ -81,4 +84,20 @@ export type BankAccount = {
   ifsc_or_routing: string;
   sort_order: number;
   active: boolean;
+};
+
+export type BlogPost = {
+  id: string;
+  slug: string;
+  title: string;
+  tag: string | null;
+  excerpt: string | null;
+  content: string;
+  cover_image_url: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  published: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
 };

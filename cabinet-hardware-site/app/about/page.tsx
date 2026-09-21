@@ -1,10 +1,12 @@
 import { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "About Us — Shahid Iqbal & Co",
+export const metadata: Metadata = pageMetadata({
+  title: 'About Shahid Iqbal & Co — Hardware Retailer in Lahore',
   description:
-    "Shahid Iqbal & Co is a Lahore-based hardware retailer specializing in brass door handles, cabinet handles, knobs, and furniture pulls.",
-};
+    'Shahid Iqbal & Co is a Lahore-based hardware retailer specializing in brass door handles, cabinet handles, knobs and furniture pulls. Visit us on Ferozepur Road or order online.',
+  path: '/about',
+});
 
 export default function AboutPage() {
   return (

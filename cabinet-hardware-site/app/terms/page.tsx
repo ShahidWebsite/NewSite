@@ -1,6 +1,12 @@
 import { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Terms of Service — Shahid Iqbal & Co" };
+export const metadata: Metadata = pageMetadata({
+  title: 'Terms of Service | Shahid Iqbal & Co',
+  description:
+    'The terms that apply when you order from Shahid Iqbal & Co, including payment by bank transfer, delivery and returns.',
+  path: '/terms',
+});
 
 export default function TermsPage() {
   return (

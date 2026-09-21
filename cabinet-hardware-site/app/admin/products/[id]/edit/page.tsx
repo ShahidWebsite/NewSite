@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import PresetSelect from "@/components/admin/PresetSelect";
+import SeoFields from "@/components/admin/SeoFields";
+import {
+  ProductSeoInput,
+  generateProductDescription,
+  generateSeoDescription,
+  generateSeoTitle,
+  slugify,
+  suggestProductName,
+} from "@/lib/seo";
 import { FINISH_OPTIONS, SIZE_OPTIONS, MATERIAL_OPTIONS, WEIGHT_UNIT_OPTIONS } from "@/lib/constants";
 
 type ExistingImage = { id: string; url: string; sort_order: number; markedForDelete: boolean };
@@ -21,10 +30,6 @@ type SpecRow = { key: string; value: string };
 
 const STORAGE_BUCKET = "product-images";
 
-function slugify(text: string) {
-  return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-}
-
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
@@ -32,9 +37,14 @@ export default function EditProductPage() {
 
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<any[]>([]);
-  const [name, setName] = useState("");
+  const [modelCode, setModelCode] = useState("");
+  const [slug, setSlug] = useState("");
+  // null = "use the automatic suggestion"; a string = the admin's own wording.
+  const [nameOverride, setNameOverride] = useState<string | null>(null);
+  const [descOverride, setDescOverride] = useState<string | null>(null);
+  const [seoTitleOverride, setSeoTitleOverride] = useState<string | null>(null);
+  const [seoDescOverride, setSeoDescOverride] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState("");
-  const [description, setDescription] = useState("");
   const [basePrice, setBasePrice] = useState("");
   const [material, setMaterial] = useState("");
   const [weight, setWeight] = useState("");
@@ -47,6 +57,33 @@ export default function EditProductPage() {
   const [error, setError] = useState<string | null>(null);
   const [addingCategory, setAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+
+  // ---- Automatic SEO content, built from whatever is entered above ----
+  const categoryName = categories.find((c) => c.id === categoryId)?.name ?? "";
+  const liveVariants = variants.filter((v) => !v.markedForDelete);
+  const finishes = Array.from(new Set(liveVariants.map((v) => v.finish.trim()).filter(Boolean)));
+  const sizes = Array.from(new Set(liveVariants.map((v) => v.size.trim()).filter(Boolean)));
+  const prices = liveVariants.map((v) => Number(v.price)).filter((n) => n > 0);
+  const holeSpacing = specs.find((s) => /hole/i.test(s.key) && s.value.trim())?.value.trim() ?? "";
+  const suggestedName = suggestProductName({ modelCode, categoryName, material, finishes });
+  const name = nameOverride ?? suggestedName;
+  const seoBase: ProductSeoInput = {
+    name,
+    modelCode,
+    categoryName,
+    material,
+    weight: weight.trim() ? `${weight.trim()}${weightUnit}` : "",
+    holeSpacing,
+    finishes,
+    sizes,
+    minPrice: prices.length ? Math.min(...prices) : Number(basePrice) || null,
+  };
+  const autoDescription = name ? generateProductDescription(seoBase) : "";
+  const description = descOverride ?? autoDescription;
+  const autoSeoTitle = name ? generateSeoTitle(seoBase) : "";
+  const autoSeoDescription = name ? generateSeoDescription(seoBase) : "";
+  const seoTitle = seoTitleOverride ?? autoSeoTitle;
+  const seoDescription = seoDescOverride ?? autoSeoDescription;
 
   useEffect(() => {
     async function load() {
@@ -66,9 +103,13 @@ export default function EditProductPage() {
         return;
       }
 
-      setName(product.name);
+      setNameOverride(product.name); // keep the existing name until the admin chooses otherwise
+      setModelCode(product.model_code ?? "");
+      setSlug(product.slug ?? "");
       setCategoryId(product.category_id ?? "");
-      setDescription(product.description ?? "");
+      setDescOverride(product.description ? product.description : null);
+      setSeoTitleOverride(product.seo_title ? product.seo_title : null);
+      setSeoDescOverride(product.seo_description ? product.seo_description : null);
       setBasePrice(String(product.base_price ?? ""));
 
       const specsEntries = Object.entries(product.specs ?? {});
@@ -177,9 +218,14 @@ export default function EditProductPage() {
       const { error: updateError } = await supabase
         .from("products")
         .update({
-          name,
-          slug: slugify(name),
+          name: name.trim(),
+          // slug is deliberately NOT changed: renaming a product must not break
+          // its web address (links, Google rankings, WhatsApp shares).
+          model_code: modelCode.trim() || null,
           description,
+          seo_title: seoTitleOverride?.trim() || null, // null = keep generating automatically
+          seo_description: seoDescOverride?.trim() || null,
+          updated_at: new Date().toISOString(),
           category_id: categoryId || null,
           base_price: Number(basePrice) || 0,
           specs: specsObject,
@@ -287,15 +333,42 @@ export default function EditProductPage() {
         )}
 
         <div className="space-y-4">
-          <label className="block">
-            <span className="font-body text-sm text-graphite">Product name</span>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="mt-1 w-full border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
-            />
-          </label>
+          <div>
+            <label className="block">
+              <span className="font-body text-sm text-graphite">Model / product code (e.g. DHB001) — optional</span>
+              <input
+                value={modelCode}
+                onChange={(e) => setModelCode(e.target.value)}
+                className="mt-1 w-full border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
+              />
+            </label>
+            <p className="mt-1 font-body text-xs text-graphite">
+              Your internal code. It is shown on the product page and used in the automatic name below.
+            </p>
+          </div>
+          <div>
+            <label className="block">
+              <span className="font-body text-sm text-graphite">Product name — what customers and Google see</span>
+              <input
+                value={name}
+                onChange={(e) => setNameOverride(e.target.value === "" ? null : e.target.value)}
+                required
+                className="mt-1 w-full border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
+              />
+            </label>
+            <p className="mt-1 font-body text-xs text-graphite">
+              {suggestedName && suggestedName !== name ? (
+                <button type="button" onClick={() => setNameOverride(null)} className="underline hover:text-ink">
+                  Use suggested name: {suggestedName}
+                </button>
+              ) : (
+                "Renaming is safe — the product's web address stays the same."
+              )}
+            </p>
+            {slug && (
+              <p className="mt-1 font-body text-xs text-graphite">Web address: /products/{slug}</p>
+            )}
+          </div>
           <label className="block">
             <span className="font-body text-sm text-graphite">Category</span>
             <select
@@ -333,15 +406,27 @@ export default function EditProductPage() {
               + Add a new category
             </button>
           )}
-          <label className="block">
-            <span className="font-body text-sm text-graphite">Description</span>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="mt-1 w-full border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
-            />
-          </label>
+          <div>
+            <label className="block">
+              <span className="font-body text-sm text-graphite">Description</span>
+              <textarea
+                value={description}
+                onChange={(e) => setDescOverride(e.target.value === "" ? null : e.target.value)}
+                rows={8}
+                className="mt-1 w-full border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink"
+              />
+            </label>
+            <p className="mt-1 font-body text-xs text-graphite">
+              {descOverride === null
+                ? "Written automatically from the details you enter (name, material, finishes, sizes, weight). Edit it freely."
+                : "Using your own wording."}
+              {descOverride !== null && (
+                <button type="button" onClick={() => setDescOverride(null)} className="ml-2 underline hover:text-ink">
+                  Regenerate from details
+                </button>
+              )}
+            </p>
+          </div>
           <label className="block">
             <span className="font-body text-sm text-graphite">Base price (shown on catalog cards)</span>
             <input
@@ -469,6 +554,18 @@ export default function EditProductPage() {
             + Add another variant
           </button>
         </div>
+
+        <SeoFields
+          urlPreview={`www.siqbalhwc.com › products › ${slug || slugify(name) || "your-product"}`}
+          title={seoTitle}
+          description={seoDescription}
+          titleIsAuto={seoTitleOverride === null}
+          descriptionIsAuto={seoDescOverride === null}
+          onTitleChange={(v) => setSeoTitleOverride(v === "" ? null : v)}
+          onDescriptionChange={(v) => setSeoDescOverride(v === "" ? null : v)}
+          onResetTitle={() => setSeoTitleOverride(null)}
+          onResetDescription={() => setSeoDescOverride(null)}
+        />
 
         <button
           type="submit"

@@ -1,6 +1,12 @@
 import { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Shipping Policy — Shahid Iqbal & Co" };
+export const metadata: Metadata = pageMetadata({
+  title: 'Shipping & Delivery Across Pakistan | Shahid Iqbal & Co',
+  description:
+    'How we pack and deliver door handles, cabinet handles and knobs from Lahore across Pakistan, and how to track your order.',
+  path: '/shipping',
+});
 
 export default function ShippingPage() {
   return (

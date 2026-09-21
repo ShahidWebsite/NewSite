@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { pageMetadata } from "@/lib/seo";
 import ProductCard from "@/components/ProductCard";
 import Testimonials from "@/components/Testimonials";
 import Reveal from "@/components/Reveal";
-import { Product } from "@/lib/types";
+import BlogCard from "@/components/BlogCard";
+import { BlogPost, Product } from "@/lib/types";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Door & Cabinet Handles in Lahore | Shahid Iqbal & Co",
+  description:
+    "Brass door handles, cabinet handles, knobs and furniture pulls in Lahore. Exact specs on every listing, bank-transfer checkout and delivery across Pakistan.",
+  path: "/",
+});
 
 // Without this, Next.js bakes the homepage into a static snapshot at build
 // time — so new products/photos added later through /admin would never show
@@ -30,13 +40,23 @@ async function getFeaturedProducts(): Promise<Product[]> {
   }));
 }
 
+async function getLatestPosts(): Promise<Pick<BlogPost, "slug" | "title" | "tag" | "excerpt" | "cover_image_url" | "content">[]> {
+  const { data } = await supabase
+    .from("blog_posts")
+    .select("slug, title, tag, excerpt, cover_image_url, content")
+    .eq("published", true)
+    .order("published_at", { ascending: false })
+    .limit(3);
+  return data ?? [];
+}
+
 async function getCategories() {
   const { data } = await supabase.from("categories").select("*").order("sort_order");
   return data ?? [];
 }
 
 export default async function HomePage() {
-  const [products, categories] = await Promise.all([getFeaturedProducts(), getCategories()]);
+  const [products, categories, posts] = await Promise.all([getFeaturedProducts(), getCategories(), getLatestPosts()]);
 
   return (
     <>
@@ -199,6 +219,27 @@ export default async function HomePage() {
       </section>
 
       <Testimonials />
+
+      {/* Latest guides — fresh content + internal links help Google understand the site */}
+      {posts.length > 0 && (
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <Reveal>
+            <div className="flex items-baseline justify-between">
+              <h2 className="font-display text-3xl text-ink">Buying guides</h2>
+              <Link href="/blog" className="font-body text-sm text-graphite hover:text-brass">
+                All guides
+              </Link>
+            </div>
+          </Reveal>
+          <div className="mt-8 grid gap-8 md:grid-cols-3">
+            {posts.map((post, i) => (
+              <Reveal key={post.slug} delay={i * 60}>
+                <BlogCard post={post} />
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }

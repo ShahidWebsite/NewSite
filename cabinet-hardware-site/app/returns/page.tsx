@@ -1,6 +1,12 @@
 import { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Returns & Exchanges — Shahid Iqbal & Co" };
+export const metadata: Metadata = pageMetadata({
+  title: 'Returns & Exchanges | Shahid Iqbal & Co',
+  description:
+    'Our returns and exchange policy for handles, knobs and door hardware ordered from Shahid Iqbal & Co, Lahore.',
+  path: '/returns',
+});
 
 export default function ReturnsPage() {
   return (

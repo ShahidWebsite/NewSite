@@ -1,6 +1,12 @@
 import { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Privacy Policy — Shahid Iqbal & Co" };
+export const metadata: Metadata = pageMetadata({
+  title: 'Privacy Policy | Shahid Iqbal & Co',
+  description:
+    'How Shahid Iqbal & Co collects, uses and protects your personal information when you shop or contact us.',
+  path: '/privacy',
+});
 
 export default function PrivacyPage() {
   return (

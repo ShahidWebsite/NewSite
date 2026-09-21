@@ -1,16 +1,32 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import VariantSelector from "@/components/VariantSelector";
 import ProductGallery from "@/components/ProductGallery";
 import ProductReviews from "@/components/ProductReviews";
+import ShareButtons from "@/components/ShareButtons";
 import { Attribute, Product } from "@/lib/types";
+import {
+  BRAND,
+  SITE_URL,
+  expandDescription,
+  generateSeoTitle,
+  pageMetadata,
+  pickMetaDescription,
+  ProductSeoInput,
+  looksLikeCode,
+  suggestProductName,
+} from "@/lib/seo";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.siqbalhwc.com";
+type ProductBundle = {
+  product: Product;
+  attributes: Attribute[];
+  category: { name: string; slug: string } | null;
+};
 
-async function getProduct(
-  slug: string
-): Promise<{ product: Product; attributes: Attribute[]; category: { name: string; slug: string } | null } | null> {
+// `cache` lets generateMetadata and the page share ONE database read per request.
+const getProduct = cache(async (slug: string): Promise<ProductBundle | null> => {
   const { data: product } = await supabase
     .from("products")
     .select("*, product_images(*), product_variants(*, variant_attribute_values(attribute_value_id)), categories(name, slug)")
@@ -59,27 +75,50 @@ async function getProduct(
       ? { name: (product as any).categories.name, slug: (product as any).categories.slug }
       : null,
   };
+});
+
+// Everything the SEO text generators need, pulled from the product's real data.
+function seoInputFor({ product, attributes, category }: ProductBundle): ProductSeoInput {
+  const valuesOf = (attrName: string) =>
+    attributes.find((a) => a.name.toLowerCase() === attrName)?.values.map((v) => v.value) ?? [];
+  const specEntry = (re: RegExp) => Object.entries(product.specs ?? {}).find(([k]) => re.test(k))?.[1] ?? null;
+  const prices = product.variants.map((v) => v.price).filter((p) => p > 0);
+
+  const base = {
+    modelCode: product.model_code ?? (looksLikeCode(product.name) ? product.name : null),
+    categoryName: category?.name ?? null,
+    material: specEntry(/^material$/i),
+    weight: specEntry(/^weight$/i),
+    holeSpacing: specEntry(/hole/i),
+    finishes: valuesOf("finish"),
+    sizes: valuesOf("size"),
+    minPrice: prices.length ? Math.min(...prices) : product.base_price,
+    description: product.description,
+  };
+  // If the product is still named only by its code (e.g. "DHB001"), the generated
+  // SEO text uses a descriptive name instead ("Brass Main Door Handle DHB001").
+  const name = looksLikeCode(product.name) ? suggestProductName(base) || product.name : product.name;
+  return { name, ...base };
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { data: product } = await supabase
-    .from("products")
-    .select("name, description, seo_title, seo_description, product_images(url)")
-    .eq("slug", params.slug)
-    .single();
+  const result = await getProduct(params.slug);
+  if (!result) return {};
 
-  if (!product) return {};
+  const input = seoInputFor(result);
+  // The admin's own SEO title/description win; otherwise they're generated
+  // fresh from the product's name, material, finishes, sizes and price.
+  const title = result.product.seo_title?.trim() || generateSeoTitle(input);
+  const description = pickMetaDescription(result.product.seo_description, input);
+  const image = result.product.images[0]?.url;
 
-  const title = product.seo_title || `${product.name} — Shahid Iqbal & Co`;
-  const description = product.seo_description || product.description || undefined;
-  const image = (product as any).product_images?.[0]?.url;
-
-  return {
+  return pageMetadata({
     title,
     description,
-    alternates: { canonical: `${SITE_URL}/products/${params.slug}` },
-    openGraph: { title, description, images: image ? [image] : undefined },
-  };
+    path: `/products/${result.product.slug}`,
+    image,
+    imageAlt: result.product.name,
+  });
 }
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
@@ -87,27 +126,65 @@ export default async function ProductPage({ params }: { params: { slug: string }
   if (!result) notFound();
   const { product, attributes, category } = result;
 
+  const { data: reviewRows } = await supabase
+    .from("reviews")
+    .select("customer_name, rating, body, created_at")
+    .eq("product_id", product.id)
+    .eq("approved", true)
+    .order("created_at", { ascending: false })
+    .limit(20);
+  const reviews = reviewRows ?? [];
+
+  const seoInput = seoInputFor(result);
+  const description = expandDescription(seoInput);
+  const descriptionParagraphs = description.split(/\n{2,}/).filter(Boolean);
+
   const totalStock = product.variants.reduce((sum, v) => sum + v.stock_qty, 0);
   const priceRange = product.variants.length
     ? [Math.min(...product.variants.map((v) => v.price)), Math.max(...product.variants.map((v) => v.price))]
     : [product.base_price, product.base_price];
+  const sku = product.model_code || product.variants.find((v) => v.sku)?.sku || undefined;
 
-  const productJsonLd = {
+  const productJsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    description: product.description || product.name,
+    description: descriptionParagraphs.join(" "),
     image: product.images.map((img) => img.url),
-    brand: { "@type": "Brand", name: "Shahid Iqbal & Co" },
+    sku,
+    mpn: product.model_code || undefined,
+    category: category?.name,
+    material: seoInput.material || undefined,
+    brand: { "@type": "Brand", name: BRAND },
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: "PKR",
       lowPrice: priceRange[0],
       highPrice: priceRange[1],
+      offerCount: Math.max(1, product.variants.length),
       availability: totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       url: `${SITE_URL}/products/${product.slug}`,
+      seller: { "@type": "Organization", name: BRAND },
     },
   };
+
+  if (reviews.length > 0) {
+    const average = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+    productJsonLd.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: Number(average.toFixed(1)),
+      reviewCount: reviews.length,
+      bestRating: 5,
+      worstRating: 1,
+    };
+    productJsonLd.review = reviews.slice(0, 5).map((r) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: r.customer_name },
+      datePublished: r.created_at?.slice(0, 10),
+      reviewBody: r.body,
+      reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+    }));
+  }
 
   const breadcrumbItems = [
     { name: "Home", url: SITE_URL },
@@ -128,14 +205,8 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <nav aria-label="Breadcrumb" className="mb-6 font-body text-xs text-graphite">
         <ol className="flex flex-wrap items-center gap-1">
@@ -162,9 +233,14 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
         <div>
           <h1 className="font-display text-4xl text-ink">{product.name}</h1>
-          {product.description && (
-            <p className="mt-4 max-w-prose font-body text-graphite">{product.description}</p>
+          {product.model_code && (
+            <p className="mt-2 font-body text-sm text-graphite">Model code: {product.model_code}</p>
           )}
+          <div className="mt-4 max-w-prose space-y-3 font-body text-graphite">
+            {descriptionParagraphs.map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+          </div>
 
           <div className="mt-8">
             <VariantSelector
@@ -190,6 +266,10 @@ export default async function ProductPage({ params }: { params: { slug: string }
               </dl>
             </div>
           )}
+
+          <div className="mt-8 border-t border-nickel/30 pt-6">
+            <ShareButtons path={`/products/${product.slug}`} text={`${product.name} — ${BRAND}`} />
+          </div>
         </div>
       </div>
 

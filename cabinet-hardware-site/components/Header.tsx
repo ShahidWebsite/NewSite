@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
 
-export default function Header() {
+export default function Header({ categories = [] }: { categories?: { name: string; slug: string }[] }) {
   const { lines } = useCart();
   const router = useRouter();
   const itemCount = lines.reduce((sum, l) => sum + l.quantity, 0);
@@ -33,8 +33,10 @@ export default function Header() {
 
         <nav className="hidden items-center gap-8 font-body text-sm text-graphite md:flex">
           <Link href="/shop" className="hover:text-ink">Shop</Link>
-          <Link href="/shop?category=cabinet-handles" className="hover:text-ink">Handles</Link>
-          <Link href="/shop?category=cabinet-knobs" className="hover:text-ink">Knobs</Link>
+          {categories.slice(0, 4).map((c) => (
+            <Link key={c.slug} href={`/shop?category=${c.slug}`} className="hover:text-ink">{c.name}</Link>
+          ))}
+          <Link href="/blog" className="hover:text-ink">Guides</Link>
           <Link href="/track-order" className="hover:text-ink">Track order</Link>
         </nav>
 
@@ -108,8 +110,10 @@ export default function Header() {
       {menuOpen && (
         <nav className="flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite md:hidden">
           <Link href="/shop" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Shop</Link>
-          <Link href="/shop?category=cabinet-handles" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Handles</Link>
-          <Link href="/shop?category=cabinet-knobs" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Knobs</Link>
+          {categories.map((c) => (
+            <Link key={c.slug} href={`/shop?category=${c.slug}`} onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">{c.name}</Link>
+          ))}
+          <Link href="/blog" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Guides</Link>
           <Link href="/track-order" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Track order</Link>
         </nav>
       )}

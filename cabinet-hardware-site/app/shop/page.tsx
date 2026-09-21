@@ -3,56 +3,54 @@ import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/ProductCard";
 import SortSelect from "@/components/SortSelect";
 import { Product } from "@/lib/types";
+import { BRAND, pageMetadata } from "@/lib/seo";
 
 const PAGE_SIZE = 12;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.siqbalhwc.com";
 
 export async function generateMetadata({
   searchParams,
 }: {
   searchParams: { category?: string; color?: string; size?: string; q?: string };
 }): Promise<Metadata> {
-  if (searchParams.q) {
-    return {
-      title: `Search: "${searchParams.q}" — Shahid Iqbal & Co`,
-      robots: { index: false }, // search-result pages shouldn't compete with real category pages
-    };
-  }
-
-  // A color/size filter on top of a category is a thin, ever-changing
-  // combination — index the category page itself, not every filter mix.
-  if (searchParams.color || searchParams.size) {
-    return { robots: { index: false } };
-  }
-
+  // Look the category up once — used for both the canonical URL and the title.
+  let category: { name: string; slug: string } | null = null;
   if (searchParams.category) {
-    const { data: category } = await supabase
+    const { data } = await supabase
       .from("categories")
       .select("name, slug")
       .eq("slug", searchParams.category)
       .maybeSingle();
+    category = data;
+  }
+  const basePath = category ? `/shop?category=${category.slug}` : "/shop";
 
-    if (category) {
-      const title = `${category.name} in Lahore — Buy Online | Shahid Iqbal & Co`;
-      const description = `Shop ${category.name.toLowerCase()} — brass, chrome, and matte black finishes in every standard size. Exact specs on every listing, bank transfer, delivery across Pakistan.`;
-      return {
-        title,
-        description,
-        alternates: { canonical: `${SITE_URL}/shop?category=${category.slug}` },
-        openGraph: { title, description },
-      };
-    }
+  // Search results and colour/size filter mixes are thin, ever-changing pages —
+  // keep them out of Google, and point their canonical at the real page.
+  if (searchParams.q) {
+    return pageMetadata({ title: `Search: "${searchParams.q}" — ${BRAND}`, path: basePath, noindex: true });
+  }
+  if (searchParams.color || searchParams.size) {
+    return pageMetadata({
+      title: category ? `${category.name} — ${BRAND}` : `Shop — ${BRAND}`,
+      path: basePath,
+      noindex: true,
+    });
   }
 
-  const title = "Shop All Cabinet Handles & Knobs — Shahid Iqbal & Co";
-  const description =
-    "Browse our full range of cabinet handles, cabinet knobs, and drawer pulls — brass, chrome, and matte black finishes, every size specified. Based in Lahore, delivered across Pakistan.";
-  return {
-    title,
-    description,
-    alternates: { canonical: `${SITE_URL}/shop` },
-    openGraph: { title, description },
-  };
+  if (category) {
+    return pageMetadata({
+      title: `${category.name} in Lahore — Buy Online | ${BRAND}`,
+      description: `Shop ${category.name.toLowerCase()} — brass, chrome, and matte black finishes in every standard size. Exact specs on every listing, bank transfer, delivery across Pakistan.`,
+      path: basePath,
+    });
+  }
+
+  return pageMetadata({
+    title: `Shop All Cabinet Handles & Knobs — ${BRAND}`,
+    description:
+      "Browse our full range of cabinet handles, cabinet knobs, and drawer pulls — brass, chrome, and matte black finishes, every size specified. Based in Lahore, delivered across Pakistan.",
+    path: "/shop",
+  });
 }
 
 async function getCategories() {

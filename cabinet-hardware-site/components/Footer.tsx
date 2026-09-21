@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Footer() {
+export default function Footer({ categories = [] }: { categories?: { name: string; slug: string }[] }) {
   return (
     <footer className="mt-24 bg-blacknickel text-stone">
       <div className="mx-auto max-w-6xl px-6 py-14">
@@ -20,6 +20,12 @@ export default function Footer() {
             <p className="mb-3 text-stone/50">Shop</p>
             <ul className="space-y-2">
               <li><Link href="/shop" className="hover:text-brass">All products</Link></li>
+              {categories.map((c) => (
+                <li key={c.slug}>
+                  <Link href={`/shop?category=${c.slug}`} className="hover:text-brass">{c.name}</Link>
+                </li>
+              ))}
+              <li><Link href="/blog" className="hover:text-brass">Guides &amp; tips</Link></li>
               <li><Link href="/track-order" className="hover:text-brass">Track an order</Link></li>
               <li><Link href="/about" className="hover:text-brass">About us</Link></li>
             </ul>

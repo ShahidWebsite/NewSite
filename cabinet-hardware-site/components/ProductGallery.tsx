@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ProductImage } from "@/lib/types";
+import { productImageAlt } from "@/lib/seo";
 
 export default function ProductGallery({
   images,
@@ -20,7 +21,7 @@ export default function ProductGallery({
         {active ? (
           <Image
             src={active.url}
-            alt={productName}
+            alt={productImageAlt(productName, activeIndex)}
             fill
             sizes="(min-width: 768px) 50vw, 100vw"
             className="object-cover"
@@ -46,7 +47,7 @@ export default function ProductGallery({
                 i === activeIndex ? "border-ink" : "border-nickel/30 hover:border-nickel"
               }`}
             >
-              <Image src={img.url} alt="" fill sizes="64px" className="object-cover" />
+              <Image src={img.url} alt={productImageAlt(productName, i)} fill sizes="64px" className="object-cover" />
             </button>
           ))}
         </div>
