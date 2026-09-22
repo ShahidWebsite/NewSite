@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { pageMetadata } from "@/lib/seo";
 import ProductCard from "@/components/ProductCard";
@@ -58,6 +59,11 @@ async function getCategories() {
 export default async function HomePage() {
   const [products, categories, posts] = await Promise.all([getFeaturedProducts(), getCategories(), getLatestPosts()]);
 
+  // Prefer the newest active product that actually has a photo, so the hero
+  // always shows something real from the catalog rather than going stale.
+  const heroProduct = products.find((p) => p.images[0]?.url);
+  const heroImage = heroProduct?.images[0]?.url;
+
   return (
     <>
       {/* Hero */}
@@ -89,21 +95,48 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Finish swatches — a literal, materials-first hero element */}
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { name: "Matte Black", hex: "#1C1B19" },
-              { name: "Golden", hex: "#A9832E" },
-              { name: "Chrome", hex: "#9B9992" },
-            ].map((finish) => (
-              <Link key={finish.name} href={`/shop?color=${encodeURIComponent(finish.name)}`} className="group space-y-3">
-                <div
-                  className="aspect-square rounded-full border-2 border-stone/40 ring-1 ring-black/20 transition-transform group-hover:scale-105"
-                  style={{ backgroundColor: finish.hex }}
+          <div>
+            {/* Product photo, when the catalog has one — this is the "hint" of
+                real hardware that makes the hero feel less flat. Falls back
+                to a soft brass-toned panel so the layout still looks
+                intentional before photography is uploaded. */}
+            <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-gradient-to-br from-brass/25 via-blacknickel to-blacknickel">
+              {heroImage ? (
+                <Image
+                  src={heroImage}
+                  alt={heroProduct?.name ?? "Featured hardware"}
+                  fill
+                  priority
+                  sizes="(min-width: 768px) 45vw, 90vw"
+                  className="object-cover"
                 />
-                <p className="text-center font-body text-xs text-stone/60 group-hover:text-stone">{finish.name}</p>
-              </Link>
-            ))}
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <svg width="72" height="72" viewBox="0 0 24 24" fill="none" className="text-brass/60">
+                    <rect x="4" y="10" width="16" height="3" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+                    <circle cx="6.5" cy="11.5" r="0.6" fill="currentColor" />
+                    <circle cx="17.5" cy="11.5" r="0.6" fill="currentColor" />
+                  </svg>
+                </div>
+              )}
+            </div>
+
+            {/* Finish swatches — a literal, materials-first hero element */}
+            <div className="mt-6 grid grid-cols-3 gap-4">
+              {[
+                { name: "Matte Black", hex: "#1C1B19" },
+                { name: "Golden", hex: "#A9832E" },
+                { name: "Chrome", hex: "#9B9992" },
+              ].map((finish) => (
+                <Link key={finish.name} href={`/shop?color=${encodeURIComponent(finish.name)}`} className="group space-y-3">
+                  <div
+                    className="aspect-square rounded-full border-2 border-stone/40 ring-1 ring-black/20 transition-transform group-hover:scale-105"
+                    style={{ backgroundColor: finish.hex }}
+                  />
+                  <p className="text-center font-body text-xs text-stone/60 group-hover:text-stone">{finish.name}</p>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -114,17 +147,38 @@ export default async function HomePage() {
           <Reveal>
             <h2 className="font-display text-3xl text-ink">Shop by category</h2>
           </Reveal>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-4">
             {categories.map((cat, i) => (
               <Reveal key={cat.id} delay={i * 60}>
                 <Link
                   href={`/shop?category=${cat.slug}`}
-                  className="group flex items-center justify-between border border-nickel/30 px-6 py-8 transition-all duration-300 hover:-translate-y-0.5 hover:border-brass hover:shadow-[0_10px_25px_-15px_rgba(42,40,37,0.3)]"
+                  className="group block border border-nickel/30 transition-all duration-300 hover:-translate-y-0.5 hover:border-brass hover:shadow-[0_10px_25px_-15px_rgba(42,40,37,0.3)]"
                 >
-                  <span className="font-display text-xl text-ink">{cat.name}</span>
-                  <span className="font-body text-graphite transition-transform duration-300 group-hover:translate-x-1 group-hover:text-brass">
-                    →
-                  </span>
+                  <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-ink/[0.06] to-brass/10">
+                    {cat.image_url ? (
+                      <Image
+                        src={cat.image_url}
+                        alt={cat.name}
+                        fill
+                        sizes="(min-width: 768px) 25vw, 50vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" className="text-brass/50">
+                          <circle cx="12" cy="8.5" r="3.2" stroke="currentColor" strokeWidth="1.3" />
+                          <line x1="12" y1="11.7" x2="12" y2="18" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                          <line x1="8.5" y1="18" x2="15.5" y2="18" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between px-5 py-4">
+                    <span className="font-display text-lg text-ink">{cat.name}</span>
+                    <span className="font-body text-graphite transition-transform duration-300 group-hover:translate-x-1 group-hover:text-brass">
+                      →
+                    </span>
+                  </div>
                 </Link>
               </Reveal>
             ))}

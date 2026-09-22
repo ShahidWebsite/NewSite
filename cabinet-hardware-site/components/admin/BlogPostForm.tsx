@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import SeoFields from "@/components/admin/SeoFields";
@@ -27,6 +27,8 @@ export default function BlogPostForm({ existing }: { existing?: BlogPost }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [insertingImage, setInsertingImage] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement | null>(null);
 
   // ---- Automatic values, built from what's been written ----
   const slug = slugOverride ?? slugify(title);
@@ -36,6 +38,49 @@ export default function BlogPostForm({ existing }: { existing?: BlogPost }) {
   const autoSeoDescription = excerpt ? generateBlogSeoDescription(excerpt) : "";
   const seoTitle = seoTitleOverride ?? autoSeoTitle;
   const seoDescription = seoDescOverride ?? autoSeoDescription;
+
+  // Uploads a photo the same way the cover photo does, then drops it into
+  // the article text as a markdown image — right where the cursor is, so a
+  // photo can sit next to whichever paragraph it explains (e.g. a sizing
+  // diagram inside a "How to measure" guide).
+  async function handleInsertImage(file: File | null) {
+    if (!file) return;
+    setInsertingImage(true);
+    setError(null);
+    try {
+      const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+      const path = `blog/${Date.now()}-${cleanName}`;
+      const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);
+      if (uploadError) throw new Error(`Image upload failed: ${uploadError.message}`);
+      const url = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+
+      const textarea = contentRef.current;
+      const markdown = `![](${url})`;
+      if (textarea) {
+        const start = textarea.selectionStart ?? content.length;
+        const end = textarea.selectionEnd ?? content.length;
+        const before = content.slice(0, start);
+        const after = content.slice(end);
+        // Keep the image on its own line, with a blank line on each side.
+        const prefix = before && !before.endsWith("\n\n") ? (before.endsWith("\n") ? "\n" : "\n\n") : "";
+        const suffix = after && !after.startsWith("\n\n") ? (after.startsWith("\n") ? "\n" : "\n\n") : "";
+        const next = `${before}${prefix}${markdown}${suffix}${after}`;
+        setContent(next);
+        // Put the cursor right after the inserted image next render.
+        requestAnimationFrame(() => {
+          const pos = (before + prefix + markdown).length;
+          textarea.focus();
+          textarea.setSelectionRange(pos, pos);
+        });
+      } else {
+        setContent((c) => `${c}${c ? "\n\n" : ""}${markdown}\n\n`);
+      }
+    } catch (err: any) {
+      setError(err.message || "Something went wrong uploading this photo.");
+    } finally {
+      setInsertingImage(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -143,14 +188,34 @@ export default function BlogPostForm({ existing }: { existing?: BlogPost }) {
         <div>
           <div className="flex items-center justify-between">
             <span className="font-body text-sm text-graphite">Article text</span>
-            <button
-              type="button"
-              onClick={() => setShowHelp((v) => !v)}
-              className="font-body text-xs text-graphite underline hover:text-ink"
-            >
-              {showHelp ? "Hide formatting help" : "Formatting help"}
-            </button>
+            <div className="flex items-center gap-4">
+              <label className="cursor-pointer font-body text-xs text-graphite underline hover:text-ink">
+                {insertingImage ? "Uploading…" : "+ Insert photo"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={insertingImage}
+                  onChange={(e) => {
+                    handleInsertImage(e.target.files?.[0] ?? null);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowHelp((v) => !v)}
+                className="font-body text-xs text-graphite underline hover:text-ink"
+              >
+                {showHelp ? "Hide formatting help" : "Formatting help"}
+              </button>
+            </div>
           </div>
+          <p className="mt-1 font-body text-xs text-graphite">
+            Click into the article text where you want a photo to appear (e.g. right after the
+            paragraph it explains), then use &quot;+ Insert photo&quot; — it drops the picture in
+            at that spot.
+          </p>
           {showHelp && (
             <pre className="mt-2 overflow-x-auto border border-nickel/30 bg-white/50 p-3 font-body text-xs leading-relaxed text-graphite">
 {`## A big heading
@@ -168,12 +233,15 @@ Normal paragraph text. **Bold**, *italic*, [a link](/shop?category=cabinet-handl
 | 96mm | Drawers |
 | 128mm | Wardrobe doors |
 
+![](a photo — use the "+ Insert photo" button above instead of typing this by hand)
+
 ## Frequently asked questions
 ### A question a customer might ask?
 The answer, in a normal paragraph.`}
             </pre>
           )}
           <textarea
+            ref={contentRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             required
