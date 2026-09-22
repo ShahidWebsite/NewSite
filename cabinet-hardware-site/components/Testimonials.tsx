@@ -15,7 +15,7 @@ export default async function Testimonials() {
   if (reviews.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
+    <section className="mx-auto max-w-[1400px] px-6 py-20">
       <Reveal>
         <p className="font-body text-sm text-brass">Customer stories</p>
         <h2 className="mt-2 font-display text-3xl text-ink">What customers say</h2>

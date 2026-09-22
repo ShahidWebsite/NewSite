@@ -54,7 +54,7 @@ export default async function BlogIndexPage() {
   const [featured, ...rest] = posts;
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
+    <div className="mx-auto max-w-[1400px] px-6 py-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <nav aria-label="Breadcrumb" className="mb-6 font-body text-xs text-graphite">

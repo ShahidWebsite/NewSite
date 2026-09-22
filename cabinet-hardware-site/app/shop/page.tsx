@@ -216,7 +216,7 @@ export default async function ShopPage({
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
+    <div className="mx-auto max-w-[1400px] px-6 py-16">
       <h1 className="font-display text-4xl text-ink">
         {searchParams.q
           ? `Results for "${searchParams.q}"`

@@ -63,7 +63,7 @@ export default async function HomePage() {
     <>
       {/* Hero */}
       <section className="bg-blacknickel text-stone">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-24 md:grid-cols-2 md:items-center md:py-32">
+        <div className="mx-auto grid max-w-[1400px] gap-10 px-6 py-24 md:grid-cols-2 md:items-center md:py-32">
           <div>
             <p className="font-body text-sm text-brass">Dream Hardware at your Door Step</p>
             <h1 className="mt-4 font-display text-5xl leading-[1.05] md:text-6xl">
@@ -111,7 +111,7 @@ export default async function HomePage() {
 
       {/* Category tiles */}
       {categories.length > 0 && (
-        <section className="mx-auto max-w-6xl px-6 py-20">
+        <section className="mx-auto max-w-[1400px] px-6 py-20">
           <Reveal>
             <h2 className="font-display text-3xl text-ink">Shop by category</h2>
           </Reveal>
@@ -156,7 +156,7 @@ export default async function HomePage() {
 
       {/* Featured products */}
       {products.length > 0 && (
-        <section className="mx-auto max-w-6xl px-6 py-20">
+        <section className="mx-auto max-w-[1400px] px-6 py-20">
           <Reveal>
             <div className="flex items-baseline justify-between">
               <h2 className="font-display text-3xl text-ink">Recently added</h2>
@@ -177,7 +177,7 @@ export default async function HomePage() {
 
       {/* Trust / specs section */}
       <section className="border-y border-nickel/20 bg-ink/[0.03] py-20">
-        <div className="mx-auto max-w-6xl px-6">
+        <div className="mx-auto max-w-[1400px] px-6">
           <div className="grid gap-6 md:grid-cols-3">
             {[
               {
@@ -244,7 +244,7 @@ export default async function HomePage() {
 
       {/* Latest guides — fresh content + internal links help Google understand the site */}
       {posts.length > 0 && (
-        <section className="mx-auto max-w-6xl px-6 py-20">
+        <section className="mx-auto max-w-[1400px] px-6 py-20">
           <Reveal>
             <div className="flex items-baseline justify-between">
               <h2 className="font-display text-3xl text-ink">Buying guides</h2>
