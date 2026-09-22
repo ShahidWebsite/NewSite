@@ -204,7 +204,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
+    <div className="mx-auto max-w-[1400px] px-6 py-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
