@@ -1,3 +1,20 @@
+# ============================================================================
+# Website update script #2 — run this from PowerShell on your computer.
+#
+# Fixes the hero photo so it's no longer a flat white box sitting on the
+# dark background: the edges now fade into the dark background, a warm
+# brass/black tint is applied so the photo's own white backdrop doesn't
+# clash, and there's a slow, subtle drift so it feels alive rather than a
+# static cut-out. Same photo as before (your newest product photo) — this
+# only changes how it's displayed.
+#
+# No SQL step needed this time — this is a code-only change.
+# ============================================================================
+
+cd "$HOME\Desktop\NewSite"        # adjust to wherever your local clone lives
+git pull origin main
+
+@'
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
@@ -315,3 +332,65 @@ export default async function HomePage() {
     </>
   );
 }
+'@ | Set-Content "cabinet-hardware-site\app\page.tsx"
+
+@'
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Instrument Serif", serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+}
+
+body {
+  background-color: #f0eee8;
+  color: #2a2825;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Visible keyboard focus everywhere */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #a9832e;
+  outline-offset: 2px;
+}
+
+/* Slow, subtle drift on the homepage hero photo — a "live" feel rather
+   than a static, pasted-on product cutout. Respects prefers-reduced-motion
+   via the rule above. */
+@keyframes heroPhotoDrift {
+  0% {
+    transform: scale(1.02) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.07) translate(-0.6%, -0.8%);
+  }
+  100% {
+    transform: scale(1.02) translate(0, 0);
+  }
+}
+.hero-photo {
+  animation: heroPhotoDrift 16s ease-in-out infinite;
+}
+'@ | Set-Content "cabinet-hardware-site\app\globals.css"
+
+git add .
+git commit -m "Blend hero photo into dark background instead of a flat boxed image"
+git push origin main
+
+Write-Host ""
+Write-Host "Done. Check https://vercel.com for the new deployment in a minute or two."
