@@ -62,8 +62,9 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-blacknickel text-stone">
-        <div className="mx-auto grid max-w-[1400px] gap-10 px-6 py-14 md:grid-cols-2 md:items-center md:py-20">
+      <section className="bg-stone-50">
+        <div className="mx-auto max-w-[1500px] px-3 pt-6">
+        <div className="grid gap-10 rounded-2xl bg-blacknickel px-8 py-12 text-stone shadow-lg md:grid-cols-2 md:items-center md:px-12 md:py-16">
           <div>
             <p className="font-body text-sm text-brass">Dream Hardware at your Door Step</p>
             <h1 className="mt-4 font-display text-5xl leading-[1.05] md:text-6xl">
@@ -107,15 +108,16 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
+        </div>
       </section>
 
       {/* Category tiles */}
       {categories.length > 0 && (
-        <section className="mx-auto max-w-[1400px] px-6 py-14">
+        <section className="mx-auto max-w-[1500px] px-3 py-10">
           <Reveal>
             <h2 className="font-display text-3xl text-ink">Shop by category</h2>
           </Reveal>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+          <div className="mt-5 grid gap-6 sm:grid-cols-2 md:grid-cols-4">
             {categories.map((cat, i) => (
               <Reveal key={cat.id} delay={i * 60}>
                 <Link
@@ -156,7 +158,7 @@ export default async function HomePage() {
 
       {/* Featured products */}
       {products.length > 0 && (
-        <section className="mx-auto max-w-[1400px] px-6 py-14">
+        <section className="mx-auto max-w-[1500px] px-3 py-10">
           <Reveal>
             <div className="flex items-baseline justify-between">
               <h2 className="font-display text-3xl text-ink">Recently added</h2>
@@ -176,8 +178,8 @@ export default async function HomePage() {
       )}
 
       {/* Trust / specs section */}
-      <section className="border-y border-nickel/20 bg-ink/[0.03] py-20">
-        <div className="mx-auto max-w-[1400px] px-6">
+      <section className="border-y border-nickel/20 bg-[#F5F1EA] py-16">
+        <div className="mx-auto max-w-[1500px] px-3">
           <div className="grid gap-6 md:grid-cols-3">
             {[
               {
@@ -225,8 +227,8 @@ export default async function HomePage() {
               },
             ].map((item, i) => (
               <Reveal key={item.title} delay={i * 100}>
-                <div className="group h-full border border-transparent px-2 py-2 transition-colors duration-300 hover:border-nickel/20">
-                  <span className="flex h-11 w-11 items-center justify-center border border-brass/40 text-brass transition-colors duration-300 group-hover:bg-brass group-hover:text-stone">
+                <div className="group h-full rounded-lg border border-nickel/30 bg-white px-6 py-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brass hover:shadow-md">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brass text-stone shadow-sm">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       {item.icon}
                     </svg>
@@ -244,7 +246,7 @@ export default async function HomePage() {
 
       {/* Latest guides — fresh content + internal links help Google understand the site */}
       {posts.length > 0 && (
-        <section className="mx-auto max-w-[1400px] px-6 py-14">
+        <section className="mx-auto max-w-[1500px] px-3 py-10">
           <Reveal>
             <div className="flex items-baseline justify-between">
               <h2 className="font-display text-3xl text-ink">Buying guides</h2>

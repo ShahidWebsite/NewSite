@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function Footer({ categories = [] }: { categories?: { name: string; slug: string }[] }) {
   return (
-    <footer className="mt-24 bg-blacknickel text-stone">
-      <div className="mx-auto max-w-[1400px] px-6 py-14">
+    <footer className="px-3 pb-6 pt-16">
+      <div className="mx-auto max-w-[1500px] rounded-2xl bg-blacknickel px-8 py-14 text-stone shadow-lg md:px-12">
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
