@@ -22,7 +22,7 @@ export async function GET() {
     const pdfBuffer = await renderToBuffer(
       React.createElement(CataloguePDF, {
         data,
-        logoUrl: 'https://www.siqbalhwc.com/logo.png?v=2',
+        logoUrl: 'https://www.siqbalhwc.com/logo.png?v=3',
       }) as any
     );
 
