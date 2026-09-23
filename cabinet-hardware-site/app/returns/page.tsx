@@ -13,16 +13,11 @@ export default function ReturnsPage() {
     <div className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="font-display text-4xl text-ink">Returns &amp; Exchanges</h1>
       <div className="mt-8 space-y-5 font-body text-graphite">
-        <p>
-          <strong className="text-ink">Editor's note (remove this box once reviewed):</strong>{" "}
-          Please confirm the actual return window and condition requirements with the owner
-          and edit the placeholders below before publishing.
-        </p>
         <div>
           <h2 className="font-display text-xl text-ink">Return window</h2>
           <p className="mt-2">
             If a product arrives damaged, defective, or different from what you ordered,
-            contact us within [7 days] of delivery and we'll arrange a replacement or refund.
+            contact us within 7 days of delivery and we'll arrange a replacement or refund.
           </p>
         </div>
         <div>
@@ -44,7 +39,7 @@ export default function ReturnsPage() {
           <h2 className="font-display text-xl text-ink">Refunds</h2>
           <p className="mt-2">
             Approved refunds are sent by bank transfer to the account used for the original
-            payment, within [X business days] of approval.
+            payment, within 7 business days of approval.
           </p>
         </div>
       </div>

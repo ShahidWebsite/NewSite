@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
+import { CatalogueDownloadButton } from "@/components/CatalogueDownloadButton";
 
 export default function Header({ categories = [] }: { categories?: { name: string; slug: string }[] }) {
   const { lines } = useCart();
@@ -38,6 +39,7 @@ export default function Header({ categories = [] }: { categories?: { name: strin
           ))}
           <Link href="/blog" className="hover:text-ink">Guides</Link>
           <Link href="/track-order" className="hover:text-ink">Track order</Link>
+          <CatalogueDownloadButton />
         </nav>
 
         <div className="flex items-center gap-4">

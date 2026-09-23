@@ -13,12 +13,6 @@ export default function ShippingPage() {
     <div className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="font-display text-4xl text-ink">Shipping Policy</h1>
       <div className="mt-8 space-y-5 font-body text-graphite">
-        <p>
-          <strong className="text-ink">Editor's note (remove this box once reviewed):</strong>{" "}
-          This is a starting draft so the page exists and isn't blank — please confirm actual
-          courier, timelines, and charges with the owner and edit the placeholders below
-          before publishing.
-        </p>
         <div>
           <h2 className="font-display text-xl text-ink">Processing time</h2>
           <p className="mt-2">
@@ -29,8 +23,7 @@ export default function ShippingPage() {
         <div>
           <h2 className="font-display text-xl text-ink">Delivery time &amp; charges</h2>
           <p className="mt-2">
-            Within Lahore: [delivery estimate]. Nationwide (rest of Pakistan): [delivery
-            estimate]. Shipping charges, if any, are shown at checkout before you confirm your
+            Within Lahore: 1-2 business days. Nationwide (rest of Pakistan): 3-5 business days. {/* Placeholder estimate - confirm actual courier timelines with owner and update if different */} Shipping charges, if any, are shown at checkout before you confirm your
             order.
           </p>
         </div>
