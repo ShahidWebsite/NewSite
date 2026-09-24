@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export default function Footer({ categories = [] }: { categories?: { name: string; slug: string }[] }) {
   return (
@@ -22,12 +22,13 @@ export default function Footer({ categories = [] }: { categories?: { name: strin
               <li><Link href="/shop" className="hover:text-brass">All products</Link></li>
               {categories.map((c) => (
                 <li key={c.slug}>
-                  <Link href={`/shop?category=${c.slug}`} className="hover:text-brass">{c.name}</Link>
+                  <Link href={`/${c.slug}`} className="hover:text-brass">{c.name}</Link>
                 </li>
               ))}
               <li><Link href="/blog" className="hover:text-brass">Guides &amp; tips</Link></li>
               <li><Link href="/track-order" className="hover:text-brass">Track an order</Link></li>
               <li><Link href="/about" className="hover:text-brass">About us</Link></li>
+              <li><Link href="/contact" className="hover:text-brass">Contact &amp; bulk enquiries</Link></li>
             </ul>
           </div>
 

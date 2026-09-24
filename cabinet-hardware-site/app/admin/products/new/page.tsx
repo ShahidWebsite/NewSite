@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import {
   suggestProductName,
 } from "@/lib/seo";
 import { FINISH_OPTIONS, SIZE_OPTIONS, MATERIAL_OPTIONS, WEIGHT_UNIT_OPTIONS } from "@/lib/constants";
+import { weightToGrams } from "@/lib/shipping";
 
 type VariantRow = { finish: string; size: string; price: string; stock: string; sku: string };
 type SpecRow = { key: string; value: string };
@@ -179,6 +180,7 @@ export default function NewProductPage() {
           category_id: categoryId || null,
           base_price: Number(basePrice) || 0,
           specs: specsObject,
+          weight_grams: weightToGrams(weight, weightUnit),
         })
         .select()
         .single();
@@ -402,6 +404,9 @@ export default function NewProductPage() {
                 ))}
               </select>
             </div>
+            <p className="mt-1 font-body text-xs text-graphite/70">
+              Also used to calculate the Cash on Delivery shipping fee — see Shipping (COD) in the admin menu.
+            </p>
           </div>
 
           <div>

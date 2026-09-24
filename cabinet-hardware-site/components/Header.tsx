@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -35,7 +35,7 @@ export default function Header({ categories = [] }: { categories?: { name: strin
         <nav className="hidden items-center gap-8 font-body text-sm text-graphite md:flex">
           <Link href="/shop" className="hover:text-ink">Shop</Link>
           {categories.slice(0, 4).map((c) => (
-            <Link key={c.slug} href={`/shop?category=${c.slug}`} className="hover:text-ink">{c.name}</Link>
+            <Link key={c.slug} href={`/${c.slug}`} className="hover:text-ink">{c.name}</Link>
           ))}
           <Link href="/blog" className="hover:text-ink">Guides</Link>
           <Link href="/track-order" className="hover:text-ink">Track order</Link>
@@ -113,10 +113,11 @@ export default function Header({ categories = [] }: { categories?: { name: strin
         <nav className="flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite md:hidden">
           <Link href="/shop" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Shop</Link>
           {categories.map((c) => (
-            <Link key={c.slug} href={`/shop?category=${c.slug}`} onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">{c.name}</Link>
+            <Link key={c.slug} href={`/${c.slug}`} onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">{c.name}</Link>
           ))}
           <Link href="/blog" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Guides</Link>
           <Link href="/track-order" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Track order</Link>
+          <Link href="/contact" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Contact</Link>
         </nav>
       )}
     </header>

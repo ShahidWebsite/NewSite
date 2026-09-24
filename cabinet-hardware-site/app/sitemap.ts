@@ -1,4 +1,4 @@
-import { MetadataRoute } from "next";
+﻿import { MetadataRoute } from "next";
 import { supabase } from "@/lib/supabase";
 import { SITE_URL } from "@/lib/seo";
 
@@ -19,6 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/shop`, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/about`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/contact`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/shipping`, changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/returns`, changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.2 },
@@ -26,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const categoryPages: MetadataRoute.Sitemap = (categories ?? []).map((c) => ({
-    url: `${SITE_URL}/shop?category=${c.slug}`,
+    url: `${SITE_URL}/${c.slug}`,
     changeFrequency: "weekly",
     priority: 0.7,
   }));

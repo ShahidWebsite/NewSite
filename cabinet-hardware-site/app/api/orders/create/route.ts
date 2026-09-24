@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { getServiceClient } from "@/lib/supabase";
+import { calculateShippingFee, DEFAULT_SHIPPING_SETTINGS, FALLBACK_ITEM_WEIGHT_GRAMS } from "@/lib/shipping";
 
 type IncomingLine = {
   variantId: string;
@@ -8,26 +9,34 @@ type IncomingLine = {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { customerName, email, phone, shippingAddress, lines } = body as {
+  const { customerName, email, phone, shippingAddress, lines, paymentMethod } = body as {
     customerName: string;
     email: string;
     phone: string;
     shippingAddress: Record<string, string>;
     lines: IncomingLine[];
+    paymentMethod?: "bank_transfer" | "cod";
   };
 
   if (!customerName || !email || !lines?.length) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
+  // Only two payment methods are wired up on the storefront today — never
+  // trust a value the browser sends beyond that.
+  const safePaymentMethod = paymentMethod === "cod" ? "cod" : "bank_transfer";
+
   const supabase = getServiceClient();
 
   // Re-fetch each variant server-side — never trust the price/stock the
-  // browser sends, since that's easy to tamper with in devtools.
+  // browser sends, since that's easy to tamper with in devtools. Also pulls
+  // the product's shipping weight, needed for the COD/shipping fee below.
   const variantIds = lines.map((l) => l.variantId);
   const { data: variants, error: variantError } = await supabase
     .from("product_variants")
-    .select("id, price, stock_qty, product_id, products(name), variant_attribute_values(attribute_value_id, attribute_values(value))")
+    .select(
+      "id, price, stock_qty, product_id, products(name, weight_grams), variant_attribute_values(attribute_value_id, attribute_values(value))"
+    )
     .in("id", variantIds);
 
   if (variantError || !variants) {
@@ -36,6 +45,7 @@ export async function POST(request: Request) {
 
   const orderItems = [];
   let subtotal = 0;
+  let totalWeightGrams = 0;
 
   for (const line of lines) {
     const variant = variants.find((v: any) => v.id === line.variantId);
@@ -57,6 +67,9 @@ export async function POST(request: Request) {
     const lineTotal = variant.price * line.quantity;
     subtotal += lineTotal;
 
+    const itemWeight = (variant as any).products?.weight_grams || FALLBACK_ITEM_WEIGHT_GRAMS;
+    totalWeightGrams += itemWeight * line.quantity;
+
     orderItems.push({
       product_id: variant.product_id,
       variant_id: variant.id,
@@ -67,6 +80,13 @@ export async function POST(request: Request) {
     });
   }
 
+  // Weight-based shipping fee, charged either way: collected by the courier
+  // on delivery for COD, or added to the bank-transfer total.
+  const { data: shippingSettingsRow } = await supabase.from("shipping_settings").select("*").single();
+  const shippingSettings = shippingSettingsRow ?? DEFAULT_SHIPPING_SETTINGS;
+  const shippingFee = calculateShippingFee(totalWeightGrams, shippingSettings);
+  const total = subtotal + shippingFee;
+
   // Create the order
   const { data: order, error: orderError } = await supabase
     .from("orders")
@@ -76,8 +96,9 @@ export async function POST(request: Request) {
       phone,
       shipping_address: shippingAddress,
       subtotal,
-      total: subtotal, // no shipping/tax logic yet — add here when ready
-      payment_method: "bank_transfer",
+      shipping_fee: shippingFee,
+      total,
+      payment_method: safePaymentMethod,
     })
     .select()
     .single();
@@ -104,6 +125,21 @@ export async function POST(request: Request) {
       .eq("id", line.variantId);
   }
 
+  const base = {
+    orderNumber: order.order_number,
+    subtotal: order.subtotal,
+    shippingFee: order.shipping_fee,
+    total: order.total,
+    paymentMethod: safePaymentMethod,
+  };
+
+  if (safePaymentMethod === "cod") {
+    return NextResponse.json({
+      ...base,
+      courierName: shippingSettings.courier_name ?? "the courier",
+    });
+  }
+
   const { data: bankAccounts } = await supabase
     .from("bank_accounts")
     .select("id, bank_name, account_title, account_number, ifsc_or_routing, sort_order, active")
@@ -113,8 +149,7 @@ export async function POST(request: Request) {
   const { data: bankSettings } = await supabase.from("bank_settings").select("instructions").single();
 
   return NextResponse.json({
-    orderNumber: order.order_number,
-    total: order.total,
+    ...base,
     bankAccounts: bankAccounts ?? [],
     instructions: bankSettings?.instructions ?? "Please use your Order Number as the payment reference.",
   });

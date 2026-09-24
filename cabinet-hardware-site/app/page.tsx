@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
@@ -121,7 +121,7 @@ export default async function HomePage() {
             {categories.map((cat, i) => (
               <Reveal key={cat.id} delay={i * 60}>
                 <Link
-                  href={`/shop?category=${cat.slug}`}
+                  href={`/${cat.slug}`}
                   className="group block border border-nickel/30 transition-all duration-300 hover:-translate-y-0.5 hover:border-brass hover:shadow-[0_10px_25px_-15px_rgba(42,40,37,0.3)]"
                 >
                   <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-ink/[0.06] to-brass/10">

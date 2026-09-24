@@ -1,4 +1,4 @@
-export type Category = {
+﻿export type Category = {
   id: string;
   name: string;
   slug: string;
@@ -85,6 +85,23 @@ export type BankAccount = {
   ifsc_or_routing: string;
   sort_order: number;
   active: boolean;
+};
+
+export type ShippingSettings = {
+  base_fee: number;
+  per_kg_rate: number;
+  courier_name: string;
+};
+
+export type Enquiry = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  message: string;
+  enquiry_type: "general" | "bulk_wholesale";
+  status: "new" | "contacted" | "closed";
+  created_at: string;
 };
 
 export type BlogPost = {

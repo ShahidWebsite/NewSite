@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -44,12 +44,22 @@ export default function AdminOrdersPage() {
             <div key={order.id} className="border border-nickel/30 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="font-body text-ink">{order.order_number}</p>
+                  <p className="font-body text-ink">
+                    {order.order_number}
+                    <span className="ml-2 border border-nickel/40 px-1.5 py-0.5 font-body text-xs uppercase text-graphite">
+                      {order.payment_method === "cod" ? "COD" : "Bank transfer"}
+                    </span>
+                  </p>
                   <p className="font-body text-sm text-graphite">
                     {order.customer_name} · {order.email}
                   </p>
                 </div>
-                <p className="font-display text-lg text-ink">Rs. {order.total.toLocaleString()}</p>
+                <div className="text-right">
+                  <p className="font-display text-lg text-ink">Rs. {order.total.toLocaleString()}</p>
+                  {order.shipping_fee > 0 && (
+                    <p className="font-body text-xs text-graphite">incl. Rs. {order.shipping_fee.toLocaleString()} shipping</p>
+                  )}
+                </div>
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-4">

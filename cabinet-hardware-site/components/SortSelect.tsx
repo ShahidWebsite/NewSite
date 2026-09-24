@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 const OPTIONS = [
   { value: "newest", label: "Newest" },
@@ -11,6 +11,7 @@ const OPTIONS = [
 export default function SortSelect() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname(); // "/shop" or the current clean category path, e.g. "/cabinet-handles"
 
   function handleChange(value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -21,7 +22,7 @@ export default function SortSelect() {
       params.set("sort", value);
     }
     const qs = params.toString();
-    router.push(qs ? `/shop?${qs}` : "/shop");
+    router.push(qs ? `${pathname}?${qs}` : pathname);
   }
 
   return (

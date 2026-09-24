@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -14,6 +14,7 @@ import {
   suggestProductName,
 } from "@/lib/seo";
 import { FINISH_OPTIONS, SIZE_OPTIONS, MATERIAL_OPTIONS, WEIGHT_UNIT_OPTIONS } from "@/lib/constants";
+import { weightToGrams } from "@/lib/shipping";
 
 type ExistingImage = { id: string; url: string; sort_order: number; markedForDelete: boolean };
 type NewImageFile = { file: File; previewUrl: string };
@@ -229,6 +230,7 @@ export default function EditProductPage() {
           category_id: categoryId || null,
           base_price: Number(basePrice) || 0,
           specs: specsObject,
+          weight_grams: weightToGrams(weight, weightUnit),
         })
         .eq("id", productId);
       if (updateError) throw updateError;
@@ -502,6 +504,9 @@ export default function EditProductPage() {
                 ))}
               </select>
             </div>
+            <p className="mt-1 font-body text-xs text-graphite/70">
+              Also used to calculate the Cash on Delivery shipping fee — see Shipping (COD) in the admin menu.
+            </p>
           </div>
         </div>
 

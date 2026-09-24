@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -9,11 +9,16 @@ export default function CheckoutPage() {
   const { lines, subtotal, clear } = useCart();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"bank_transfer" | "cod">("bank_transfer");
   const [confirmation, setConfirmation] = useState<{
     orderNumber: string;
+    subtotal: number;
+    shippingFee: number;
     total: number;
-    bankAccounts: BankAccount[];
-    instructions: string;
+    paymentMethod: "bank_transfer" | "cod";
+    bankAccounts?: BankAccount[];
+    instructions?: string;
+    courierName?: string;
   } | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -35,6 +40,7 @@ export default function CheckoutPage() {
         country: form.get("country"),
       },
       lines: lines.map((l) => ({ variantId: l.variantId, quantity: l.quantity })),
+      paymentMethod,
     };
 
     try {
@@ -70,30 +76,49 @@ export default function CheckoutPage() {
         </p>
 
         <div className="mt-8 space-y-4">
-          <p className="font-body text-sm text-graphite">
-            Complete your payment by bank transfer to any one of the accounts below
-          </p>
-          {confirmation.bankAccounts.length === 0 ? (
-            <p className="border border-nickel/30 p-6 font-body text-sm text-rust">
-              No bank account is set up yet — contact us on WhatsApp to arrange payment for
-              this order.
-            </p>
-          ) : (
-            confirmation.bankAccounts.map((acc) => (
-              <div key={acc.id} className="border border-nickel/30 p-6">
-                <p className="font-display text-lg text-ink">{acc.bank_name}</p>
-                <dl className="mt-3 space-y-2 font-body text-sm">
-                  <Row label="Account title" value={acc.account_title} />
-                  <Row label="Account number" value={acc.account_number} />
-                  {acc.ifsc_or_routing && <Row label="IBAN / Routing" value={acc.ifsc_or_routing} />}
-                </dl>
-              </div>
-            ))
-          )}
           <div className="border-t border-nickel/20 pt-4">
-            <Row label="Amount to pay" value={`Rs. ${confirmation.total.toLocaleString()}`} />
+            <Row label="Products" value={`Rs. ${confirmation.subtotal.toLocaleString()}`} />
+            <Row label="Shipping" value={`Rs. ${confirmation.shippingFee.toLocaleString()}`} />
+            <div className="mt-2 border-t border-nickel/20 pt-2">
+              <Row label="Total" value={`Rs. ${confirmation.total.toLocaleString()}`} />
+            </div>
           </div>
-          <p className="font-body text-sm text-graphite">{confirmation.instructions}</p>
+
+          {confirmation.paymentMethod === "cod" ? (
+            <div className="border border-nickel/30 p-6">
+              <p className="font-display text-lg text-ink">Cash on Delivery</p>
+              <p className="mt-2 font-body text-sm text-graphite">
+                Your order will be dispatched via {confirmation.courierName}. Have{" "}
+                <span className="text-ink">Rs. {confirmation.total.toLocaleString()}</span> ready
+                to pay the rider in cash on delivery — this already includes the weight-based
+                shipping charge, so there&rsquo;s nothing extra to pay.
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="font-body text-sm text-graphite">
+                Complete your payment by bank transfer to any one of the accounts below
+              </p>
+              {(confirmation.bankAccounts?.length ?? 0) === 0 ? (
+                <p className="border border-nickel/30 p-6 font-body text-sm text-rust">
+                  No bank account is set up yet — contact us on WhatsApp to arrange payment for
+                  this order.
+                </p>
+              ) : (
+                confirmation.bankAccounts!.map((acc) => (
+                  <div key={acc.id} className="border border-nickel/30 p-6">
+                    <p className="font-display text-lg text-ink">{acc.bank_name}</p>
+                    <dl className="mt-3 space-y-2 font-body text-sm">
+                      <Row label="Account title" value={acc.account_title} />
+                      <Row label="Account number" value={acc.account_number} />
+                      {acc.ifsc_or_routing && <Row label="IBAN / Routing" value={acc.ifsc_or_routing} />}
+                    </dl>
+                  </div>
+                ))
+              )}
+              <p className="font-body text-sm text-graphite">{confirmation.instructions}</p>
+            </>
+          )}
         </div>
 
         <Link
@@ -152,14 +177,33 @@ export default function CheckoutPage() {
             ))}
           </div>
           <div className="mt-4 flex justify-between font-body">
-            <span className="text-graphite">Total</span>
+            <span className="text-graphite">Products</span>
             <span className="text-ink">Rs. {subtotal.toLocaleString()}</span>
           </div>
-
-          <p className="mt-6 font-body text-sm text-graphite">
-            Payment is by bank transfer. Account details will be shown once
-            your order is placed.
+          <p className="mt-1 font-body text-xs text-graphite">
+            Shipping is calculated by weight and shown on the next screen once your order is
+            placed.
           </p>
+
+          <div className="mt-6">
+            <p className="font-body text-sm text-graphite">Payment method</p>
+            <div className="mt-2 space-y-2">
+              <PaymentOption
+                value="bank_transfer"
+                selected={paymentMethod === "bank_transfer"}
+                onSelect={() => setPaymentMethod("bank_transfer")}
+                title="Bank transfer"
+                description="Pay the full amount (products + shipping) by bank transfer. Account details shown after you place the order."
+              />
+              <PaymentOption
+                value="cod"
+                selected={paymentMethod === "cod"}
+                onSelect={() => setPaymentMethod("cod")}
+                title="Cash on Delivery — Leopard Courier"
+                description="Pay the rider in cash when your order arrives. Includes the weight-based shipping charge."
+              />
+            </div>
+          </div>
 
           {error && <p className="mt-4 font-body text-sm text-rust">{error}</p>}
 
@@ -196,6 +240,41 @@ function Field({
         required={required}
         className="mt-1 w-full border border-nickel/50 bg-transparent px-3 py-2 font-body text-ink focus:border-ink"
       />
+    </label>
+  );
+}
+
+function PaymentOption({
+  value,
+  selected,
+  onSelect,
+  title,
+  description,
+}: {
+  value: string;
+  selected: boolean;
+  onSelect: () => void;
+  title: string;
+  description: string;
+}) {
+  return (
+    <label
+      className={`flex cursor-pointer items-start gap-3 border p-3 font-body text-sm ${
+        selected ? "border-ink" : "border-nickel/40"
+      }`}
+    >
+      <input
+        type="radio"
+        name="paymentMethodChoice"
+        value={value}
+        checked={selected}
+        onChange={onSelect}
+        className="mt-1"
+      />
+      <span>
+        <span className="block text-ink">{title}</span>
+        <span className="block text-xs text-graphite">{description}</span>
+      </span>
     </label>
   );
 }
