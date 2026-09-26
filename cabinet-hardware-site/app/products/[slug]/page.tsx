@@ -1,4 +1,4 @@
-import { cache } from "react";
+﻿import { cache } from "react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
@@ -18,6 +18,13 @@ import {
   looksLikeCode,
   suggestProductName,
 } from "@/lib/seo";
+
+// Without this, a product page (no generateStaticParams here) gets rendered
+// once on first visit and then cached indefinitely — so a price or stock
+// change made in /admin would NOT show up on the live page until the next
+// deploy. This re-checks each product page against the database at most
+// once a minute instead.
+export const revalidate = 60;
 
 type ProductBundle = {
   product: Product;
@@ -268,7 +275,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
           )}
 
           <div className="mt-8 border-t border-nickel/30 pt-6">
-            <ShareButtons path={`/products/${product.slug}`} text={`${product.name} — ${BRAND}`} />
+            <ShareButtons path={`/products/${product.slug}`} text={`${product.name} â€” ${BRAND}`} />
           </div>
         </div>
       </div>
