@@ -1,10 +1,17 @@
-// app/api/catalogue/route.ts
+﻿// app/api/catalogue/route.ts
 //
 // GET /api/catalogue → generates and streams back a PDF built from
-// whatever products/variants are live in Supabase RIGHT NOW.
-// Never cached (force-dynamic + no-store), so every click reflects
-// your latest stock, prices, and images — including ones you added
-// five minutes ago.
+// whatever products/variants were live in Supabase as of the last
+// regeneration.
+//
+// Cached for 30 minutes: building this PDF re-downloads every product
+// photo and re-renders the whole document, which is genuinely slow
+// (that's what was making "Download Catalogue" feel unfair) — there's no
+// reason to pay that cost on every single click. The first download after
+// data changes (or after 30 minutes) regenerates it; everyone else in that
+// window gets an instant cached copy. If you need a brand-new catalogue
+// to go out sooner than that (e.g. right after a big price update),
+// just redeploy — that always busts this cache immediately.
 
 import { NextResponse } from 'next/server';
 import { renderToBuffer } from '@react-pdf/renderer';
@@ -12,8 +19,7 @@ import React from 'react';
 import { getCatalogueData } from '@/lib/catalogue-data';
 import { CataloguePDF } from '@/lib/CataloguePDF';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 1800; // 30 minutes
 
 export async function GET() {
   try {
@@ -31,7 +37,7 @@ export async function GET() {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'attachment; filename="Shahid-Iqbal-Co-Catalogue.pdf"',
-        'Cache-Control': 'no-store',
+        'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=300',
       },
     });
   } catch (err) {
