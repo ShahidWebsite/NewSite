@@ -16,10 +16,12 @@ export const metadata: Metadata = pageMetadata({
   path: "/",
 });
 
-// Without this, Next.js bakes the homepage into a static snapshot at build
-// time — so new products/photos added later through /admin would never show
-// up here until the next deploy. This makes it fetch fresh data every visit.
-export const dynamic = "force-dynamic";
+// Cached and served instantly, then re-checked in the background at most
+// once a minute — new products/photos added through /admin still appear
+// quickly, but visitors aren't stuck waiting on a database round-trip
+// (previously this was "force-dynamic", which hit the database on every
+// single homepage visit).
+export const revalidate = 60;
 
 async function getFeaturedProducts(): Promise<Product[]> {
   const { data } = await supabase
