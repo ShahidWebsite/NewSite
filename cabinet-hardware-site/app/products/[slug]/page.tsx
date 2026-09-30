@@ -195,7 +195,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   const breadcrumbItems = [
     { name: "Home", url: SITE_URL },
-    ...(category ? [{ name: category.name, url: `${SITE_URL}/shop?category=${category.slug}` }] : []),
+    ...(category ? [{ name: category.name, url: `${SITE_URL}/${category.slug}` }] : []),
     { name: product.name, url: `${SITE_URL}/products/${product.slug}` },
   ];
 
@@ -224,7 +224,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
             <>
               <li aria-hidden="true">/</li>
               <li>
-                <a href={`/shop?category=${category.slug}`} className="hover:text-ink">
+                <a href={`/${category.slug}`} className="hover:text-ink">
                   {category.name}
                 </a>
               </li>

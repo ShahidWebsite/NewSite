@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   description:
     "Door handles, cabinet handles, knobs, and furniture pulls, specialized in brass. Based in Lahore — order online with bank transfer and track your delivery.",
   applicationName: BRAND,
+  verification: { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION },
   // Fallback social-share card for any page that doesn't set its own.
   openGraph: {
     type: "website",
@@ -70,6 +71,14 @@ const localBusinessJsonLd = {
   ],
 };
 
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: BRAND,
+  url: SITE_URL,
+  inLanguage: "en-PK",
+};
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const categories = await getNavCategories();
   return (
@@ -77,7 +86,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([localBusinessJsonLd, websiteJsonLd]) }}
         />
         {GA_ID && (
           <>
