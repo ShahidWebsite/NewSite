@@ -1,4 +1,4 @@
-import { cache } from "react";
+﻿import { cache } from "react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -83,7 +83,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       "@type": "BlogPosting",
       headline: post.title,
       description,
-      image: [post.cover_image_url || ogImageUrl({ title: post.title, tag: post.tag || undefined })],
+      image: [(post.cover_image_url && post.cover_image_url.startsWith("/") ? SITE_URL + post.cover_image_url : post.cover_image_url) || ogImageUrl({ title: post.title, tag: post.tag || undefined })],
       datePublished: published,
       dateModified: post.updated_at,
       articleSection: post.tag || undefined,
