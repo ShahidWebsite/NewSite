@@ -19,7 +19,7 @@ import React from 'react';
 import { getCatalogueData } from '@/lib/catalogue-data';
 import { CataloguePDF } from '@/lib/CataloguePDF';
 
-export const revalidate = 1800; // 30 minutes
+export const revalidate = 300; // 5 minutes
 
 export async function GET() {
   try {
@@ -37,7 +37,7 @@ export async function GET() {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'attachment; filename="Shahid-Iqbal-Co-Catalogue.pdf"',
-        'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=300',
+        'Cache-Control': 'public, max-age=0, s-maxage=300, stale-while-revalidate=300',
       },
     });
   } catch (err) {

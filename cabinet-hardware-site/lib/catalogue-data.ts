@@ -1,4 +1,4 @@
-// lib/catalogue-data.ts
+﻿// lib/catalogue-data.ts
 //
 // Fetches the CURRENT active product catalogue straight from Supabase,
 // grouped by category (in the order your categories.sort_order defines).
@@ -23,9 +23,19 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// Next.js 14 caches every fetch() by default, which includes the ones
+// supabase-js makes internally. That is what can leave a newly added
+// category (e.g. Brass Knob) missing from the catalogue. no-store makes
+// each catalogue build read live data; the route still caches the PDF itself.
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    global: {
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, cache: 'no-store' }),
+    },
+  }
 );
 
 export type CatalogueVariant = {
@@ -62,10 +72,15 @@ export async function getCatalogueData(): Promise<CatalogueCategory[]> {
     throw new Error(`Failed to load categories: ${catError.message}`);
   }
 
-  const { data: products, error: prodError } = await supabase
-    .from('products')
-    .select(
-      `
+  // Page through products: Supabase returns at most 1000 rows per request,
+  // and nested images/variants make large catalogues hit limits sooner.
+  const PAGE = 200;
+  const products: any[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error: prodError } = await supabase
+      .from('products')
+      .select(
+        `
       id,
       name,
       slug,
@@ -87,17 +102,22 @@ export async function getCatalogueData(): Promise<CatalogueCategory[]> {
         )
       )
     `
-    )
-    .eq('status', 'active')
-    .order('name', { ascending: true });
+      )
+      .eq('status', 'active')
+      .order('name', { ascending: true })
+      .order('id', { ascending: true })
+      .range(from, from + PAGE - 1);
 
-  if (prodError) {
-    throw new Error(`Failed to load products: ${prodError.message}`);
+    if (prodError) {
+      throw new Error(`Failed to load products: ${prodError.message}`);
+    }
+    products.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
   }
 
   const byCategoryId: Record<string, CatalogueProduct[]> = {};
 
-  for (const p of (products ?? []) as any[]) {
+  for (const p of products) {
     const images = (p.product_images ?? []).slice().sort(
       (a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
     );
@@ -144,9 +164,15 @@ export async function getCatalogueData(): Promise<CatalogueCategory[]> {
     }
   }
 
-  // Any active products whose category_id didn't match a known category
-  if (byCategoryId['uncategorised']?.length) {
-    result.push({ category: 'Other', products: byCategoryId['uncategorised'] });
+  // Products whose category_id matches no known category (or has none)
+  // must not vanish from the catalogue silently.
+  const known = new Set((categories ?? []).map((c: any) => c.id));
+  const orphans: CatalogueProduct[] = [];
+  for (const [id, prods] of Object.entries(byCategoryId)) {
+    if (id === 'uncategorised' || !known.has(id)) orphans.push(...prods);
+  }
+  if (orphans.length) {
+    result.push({ category: 'Other', products: orphans });
   }
 
   return result;
