@@ -205,7 +205,7 @@ export function generateSeoDescription(i: ProductSeoInput) {
   const finishes = (i.finishes ?? []).map(clean).filter(Boolean);
   const sizes = (i.sizes ?? []).map(clean).filter(Boolean);
 
-  let out = `Buy ${name} online from ${BRAND}, Lahore.`;
+  let out = `${name} — wholesale and retail from ${BRAND}, Lahore.`;
   const extras: string[] = [];
   if (i.material) extras.push(`${clean(i.material)} construction.`);
   if (finishes.length) extras.push(`${finishes.length > 1 ? "Finishes" : "Finish"}: ${joinList(finishes)}.`);
@@ -237,7 +237,7 @@ export function generateProductDescription(i: ProductSeoInput) {
   const p2 = specBits.length ? `${specBits.join(", ").replace(/^./, (c) => c.toUpperCase())}.` : "";
 
   const p3 = fitTip(kind);
-  const p4 = `Order online with bank transfer and delivery across Pakistan, or WhatsApp us on ${PHONE} for bulk and wholesale prices.`;
+  const p4 = `We supply hardware shops, carpenters and contractors across Pakistan as well as retail customers. Order online with bank transfer or Cash on Delivery, or WhatsApp us on ${PHONE} for wholesale and trade prices.`;
 
   return [[p1, p2].filter(Boolean).join(" "), p3, p4].join("\n\n");
 }

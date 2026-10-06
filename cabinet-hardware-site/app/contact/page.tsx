@@ -3,9 +3,9 @@ import { pageMetadata } from "@/lib/seo";
 import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Contact Us & Bulk / Wholesale Enquiries — Shahid Iqbal & Co",
+  title: "Wholesale Enquiries & Contact — Cabinet Handles, Lahore | Shahid Iqbal & Co",
   description:
-    "Get in touch with Shahid Iqbal & Co for questions, custom orders, or bulk/wholesale pricing on cabinet handles, knobs, and door hardware. WhatsApp, call, or send a message — Lahore, Pakistan.",
+    "Ask Shahid Iqbal & Co for wholesale rates on cabinet handles, knobs and door hardware. We supply hardware shops across Pakistan from Lahore. WhatsApp +92 311 7798157.",
   path: "/contact",
 });
 

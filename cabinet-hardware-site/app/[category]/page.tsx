@@ -37,8 +37,8 @@ export async function generateMetadata({
   }
 
   return pageMetadata({
-    title: `${category.name} in Lahore — Buy Online | ${BRAND}`,
-    description: `Shop ${category.name.toLowerCase()} — brass, chrome, and matte black finishes in every standard size. Exact specs on every listing, bank transfer or Cash on Delivery, delivery across Pakistan.`,
+    title: `${category.name} — Wholesale & Retail, Lahore | ${BRAND}`,
+    description: `${category.name} wholesale and retail from Lahore — brass, chrome and matte black in every standard size. Supplying hardware shops across Pakistan. Bank transfer or COD.`,
     path: basePath,
   });
 }

@@ -21,9 +21,9 @@ export async function generateMetadata({
   }
 
   return pageMetadata({
-    title: `Shop All Cabinet Handles & Knobs — ${BRAND}`,
+    title: `Cabinet Handles & Knobs — Wholesale & Retail | ${BRAND}`,
     description:
-      "Browse our full range of cabinet handles, cabinet knobs, and drawer pulls — brass, chrome, and matte black finishes, every size specified. Based in Lahore, delivered across Pakistan.",
+      "Cabinet handles, knobs and drawer pulls in brass, chrome and matte black, every size specified. Wholesale and retail from Lahore, delivered across Pakistan.",
     path: "/shop",
   });
 }

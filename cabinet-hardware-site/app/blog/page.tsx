@@ -9,9 +9,9 @@ import { BRAND, SITE_URL, pageMetadata } from "@/lib/seo";
 export const revalidate = 60;
 
 export const metadata: Metadata = pageMetadata({
-  title: `Handle & Knob Buying Guides | ${BRAND}`,
+  title: `Wholesale & Buying Guides: Handles, Knobs, Hardware | ${BRAND}`,
   description:
-    "Plain-language guides on measuring hole spacing, choosing materials and finishes, and fitting cabinet handles, knobs and main door handles — from our Lahore hardware shop.",
+    "Guides for hardware shops and home owners in Pakistan: wholesale ordering, what to stock, hole spacing, sizes, materials and finishes. From our Lahore hardware supplier.",
   path: "/blog",
 });
 

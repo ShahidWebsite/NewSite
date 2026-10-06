@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { pageMetadata } from "@/lib/seo";
+import { REGIONS, WHOLESALE_HUB_SLUG } from "@/lib/regions";
 import ProductCard from "@/components/ProductCard";
 import Testimonials from "@/components/Testimonials";
 import Reveal from "@/components/Reveal";
@@ -10,9 +11,9 @@ import BlogCard from "@/components/BlogCard";
 import { BlogPost, Product } from "@/lib/types";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Door & Cabinet Handles in Lahore | Shahid Iqbal & Co",
+  title: "Cabinet Handles & Knobs Wholesale in Pakistan — Lahore | Shahid Iqbal & Co",
   description:
-    "Brass door handles, cabinet handles, knobs and furniture pulls in Lahore. Exact specs on every listing, bank-transfer checkout and delivery across Pakistan.",
+    "Wholesale and retail cabinet handles, knobs and brass door handles from Lahore. Supplying hardware shops in Punjab, Sindh, AJK, KPK and Islamabad. Trade rates on WhatsApp.",
   path: "/",
 });
 
@@ -70,12 +71,13 @@ export default async function HomePage() {
           <div>
             <p className="font-body text-sm text-brass">Dream Hardware at your Door Step</p>
             <h1 className="mt-4 font-display text-5xl leading-[1.05] md:text-6xl">
-              Handles and knobs that hold up to daily use.
+              Cabinet handles &amp; knobs, wholesale and retail from Lahore.
             </h1>
             <p className="mt-6 max-w-prose font-body text-stone/70">
-              Door handles, cabinet handles, knobs, and furniture pulls —
-              specialized in brass, in the sizes your cabinets already take.
-              Every listing shows the exact hole spacing before you order.
+              We supply hardware shops, carpenters and contractors across Pakistan,
+              and sell to retail customers too. Cabinet handles, knobs, door handles
+              and furniture pulls, specialized in brass. Every listing shows the
+              exact hole spacing before you order.
             </p>
             <div className="mt-8 flex gap-4">
               <Link
@@ -85,10 +87,10 @@ export default async function HomePage() {
                 Shop all products
               </Link>
               <Link
-                href="/track-order"
+                href="/contact"
                 className="border border-stone/30 px-6 py-3 font-body text-sm text-stone transition-colors hover:border-stone"
               >
-                Track an order
+                Wholesale enquiry
               </Link>
             </div>
           </div>
@@ -178,6 +180,34 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Pakistan-wide wholesale coverage — real text + internal links to the regional guides */}
+      <section className="mx-auto max-w-[1500px] px-3 py-10">
+        <Reveal>
+          <h2 className="font-display text-3xl text-ink">Wholesale cabinet handles &amp; knobs, supplied across Pakistan</h2>
+          <p className="mt-3 max-w-3xl font-body text-graphite">
+            Shahid Iqbal &amp; Co deals from Lahore and ships to hardware shops and trade customers in
+            Punjab, Sindh, Azad Kashmir, Khyber Pakhtunkhwa and Islamabad. Most of our customers are
+            hardware shops; single pieces and small orders are welcome at retail.{" "}
+            <Link href={`/blog/${WHOLESALE_HUB_SLUG}`} className="text-ink underline hover:text-brass">
+              How wholesale works
+            </Link>
+          </p>
+        </Reveal>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          {REGIONS.map((r, i) => (
+            <Reveal key={r.slug} delay={i * 50}>
+              <Link
+                href={`/blog/${r.slug}`}
+                className="block h-full border border-nickel/30 px-5 py-4 transition-colors hover:border-brass"
+              >
+                <p className="font-display text-lg text-ink">Cabinet handles — {r.name}</p>
+                <p className="mt-1 font-body text-sm text-graphite">{r.cities}</p>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
 
       {/* Trust / specs section */}
       <section className="border-y border-nickel/20 bg-[#F5F1EA] py-16">

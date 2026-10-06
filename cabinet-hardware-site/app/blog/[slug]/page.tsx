@@ -179,7 +179,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           <p className="font-display text-2xl text-ink">Ready to choose?</p>
           <p className="mt-2 font-body text-sm text-graphite">
             Every product page lists the exact size, finish and hole spacing. Not sure what fits? Send us
-            your measurements on WhatsApp at {PHONE} and we will help you pick.
+            your measurements on WhatsApp at {PHONE} and we will help you pick. Hardware shop or trade
+            buyer anywhere in Pakistan? Ask for wholesale rates on WhatsApp or through the{" "}
+            <Link href="/contact" className="text-ink underline hover:text-brass">bulk enquiry form</Link>.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             {categories.map((c) => (

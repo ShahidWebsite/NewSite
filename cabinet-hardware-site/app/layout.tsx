@@ -4,6 +4,7 @@ import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import { supabase } from "@/lib/supabase";
 import { BRAND, SITE_URL, ogImageUrl } from "@/lib/seo";
+import { AREA_CITIES, AREA_REGIONS } from "@/lib/regions";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -22,11 +23,11 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Shahid Iqbal & Co — Cabinet Handles & Knobs in Lahore",
+    default: "Cabinet Handles & Knobs Wholesale in Pakistan — Lahore | Shahid Iqbal & Co",
     template: "%s",
   },
   description:
-    "Door handles, cabinet handles, knobs, and furniture pulls, specialized in brass. Based in Lahore — order online with bank transfer and track your delivery.",
+    "Wholesale and retail cabinet handles, knobs, door handles and furniture hardware from Lahore. Supplying hardware shops across Punjab, Sindh, AJK, KPK and Islamabad. Specialized in brass.",
   applicationName: BRAND,
   verification: { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION },
   // Fallback social-share card for any page that doesn't set its own.
@@ -58,7 +59,14 @@ const localBusinessJsonLd = {
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
   image: `${SITE_URL}/logo.png`,
-  areaServed: { "@type": "Country", name: "Pakistan" },
+  description:
+    "Cabinet and furniture hardware supplier in Lahore, Pakistan. Wholesale and retail cabinet handles, knobs, door handles and furniture hardware for hardware shops and trade customers across Punjab, Sindh, Azad Kashmir, Khyber Pakhtunkhwa and Islamabad.",
+  knowsAbout: ["wholesale cabinet handles", "cabinet knobs", "brass door handles", "furniture hardware"],
+  areaServed: [
+    { "@type": "Country", name: "Pakistan" },
+    ...AREA_REGIONS.map((name) => ({ "@type": "AdministrativeArea", name })),
+    ...AREA_CITIES.map((name) => ({ "@type": "City", name })),
+  ],
   address: {
     "@type": "PostalAddress",
     streetAddress: "218/18 Ferozepur Road, near WAPDA Hospital",
