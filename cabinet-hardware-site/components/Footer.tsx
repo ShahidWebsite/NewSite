@@ -16,6 +16,9 @@ export default function Footer({ categories = [] }: { categories?: { name: strin
               handles, knobs, door handles and furniture pulls from Lahore,
               specialized in brass. Serving hardware shops across Pakistan.
             </p>
+            <ul className="mt-4 font-body text-sm">
+              <li><Link href="/about" className="hover:text-brass">About us</Link></li>
+            </ul>
           </div>
 
           <div className="font-body text-sm">
@@ -27,11 +30,8 @@ export default function Footer({ categories = [] }: { categories?: { name: strin
                   <Link href={`/${c.slug}`} className="hover:text-brass">{c.name}</Link>
                 </li>
               ))}
-              <li><Link href={`/blog/${WHOLESALE_HUB_SLUG}`} className="hover:text-brass">Wholesale supplier</Link></li>
               <li><Link href="/blog" className="hover:text-brass">Guides &amp; tips</Link></li>
               <li><Link href="/track-order" className="hover:text-brass">Track an order</Link></li>
-              <li><Link href="/about" className="hover:text-brass">About us</Link></li>
-              <li><Link href="/contact" className="hover:text-brass">Contact &amp; bulk enquiries</Link></li>
             </ul>
           </div>
 
@@ -61,21 +61,22 @@ export default function Footer({ categories = [] }: { categories?: { name: strin
                 </a>
               </li>
             </ul>
+            <ul className="mt-4 space-y-2">
+              <li><Link href="/contact" className="hover:text-brass">Contact &amp; bulk enquiries</Link></li>
+              <li><Link href={`/blog/${WHOLESALE_HUB_SLUG}`} className="hover:text-brass">Wholesale supplier</Link></li>
+            </ul>
+            <p className="mb-2 mt-5 text-stone/50">We supply from Lahore to</p>
+            <ul className="space-y-1.5 text-stone/80">
+              {REGIONS.map((r) => (
+                <li key={r.slug}>
+                  <Link href={`/blog/${r.slug}`} className="hover:text-brass">{r.name}</Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        <div className="mt-10 border-t border-stone/10 pt-6 font-body text-xs text-stone/60">
-          <p className="mb-2 text-stone/50">We supply from Lahore to</p>
-          <ul className="flex flex-wrap gap-x-5 gap-y-1">
-            {REGIONS.map((r) => (
-              <li key={r.slug}>
-                <Link href={`/blog/${r.slug}`} className="hover:text-brass">{r.name}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <p className="mt-6 border-t border-stone/10 pt-6 font-body text-xs text-stone/40">
+        <p className="mt-12 border-t border-stone/10 pt-6 font-body text-xs text-stone/40">
           © {new Date().getFullYear()} Shahid Iqbal &amp; Co. All rights reserved.
         </p>
       </div>
