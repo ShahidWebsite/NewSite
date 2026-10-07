@@ -3,8 +3,8 @@
 // nothing reaches the store without the logo on it.
 
 export const WATERMARK = {
-  opacity: 0.28, // 0 = invisible, 1 = solid. 0.28 = light but visible
-  sizeRatio: 0.16, // logo size as a share of the photo's shorter side
+  opacity: 0.45, // 0 = invisible, 1 = solid. 0.28 = light but visible
+  sizeRatio: 0.20, // logo size as a share of the photo's shorter side
   marginRatio: 0.03, // gap from the bottom-right corner
   maxSide: 3000, // photos bigger than this are scaled down (still very sharp)
   jpegQuality: 0.92,
