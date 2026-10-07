@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { watermarkImage } from "@/lib/watermark";
 import PresetSelect from "@/components/admin/PresetSelect";
 import SeoFields from "@/components/admin/SeoFields";
 import {
@@ -117,7 +118,7 @@ export default function NewProductPage() {
   async function uploadImages(productId: string) {
     const uploaded: { url: string; sort_order: number }[] = [];
     for (let i = 0; i < imageFiles.length; i++) {
-      const { file } = imageFiles[i];
+      const file = await watermarkImage(imageFiles[i].file);
       const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
       const path = `${productId}/${Date.now()}-${cleanName}`;
 

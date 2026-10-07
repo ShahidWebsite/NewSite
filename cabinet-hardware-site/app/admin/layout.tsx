@@ -41,6 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <AdminLink href="/admin/reviews" label="Reviews" />
           <AdminLink href="/admin/bank-accounts" label="Bank Accounts" />
           <AdminLink href="/admin/shipping-settings" label="Shipping (COD)" />
+          <AdminLink href="/admin/watermark-existing" label="Watermark old photos" />
         </nav>
         <button
           onClick={async () => {

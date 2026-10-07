@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import { watermarkImage } from "@/lib/watermark";
 
 const STORAGE_BUCKET = "product-images"; // same bucket as product photos, in a "categories/" folder
 
@@ -73,6 +74,7 @@ export default function AdminCategoriesPage() {
     setError(null);
     setUploadingId(id);
     try {
+      file = await watermarkImage(file);
       const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
       const path = `categories/${id}-${Date.now()}-${cleanName}`;
       const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);

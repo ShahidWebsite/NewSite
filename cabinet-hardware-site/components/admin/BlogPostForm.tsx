@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { watermarkImage } from "@/lib/watermark";
 import SeoFields from "@/components/admin/SeoFields";
 import { firstParagraph } from "@/lib/markdown";
 import { generateBlogSeoDescription, generateBlogSeoTitle, slugify, truncateAtWord } from "@/lib/seo";
@@ -48,6 +49,7 @@ export default function BlogPostForm({ existing }: { existing?: BlogPost }) {
     setInsertingImage(true);
     setError(null);
     try {
+      file = await watermarkImage(file);
       const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
       const path = `blog/${Date.now()}-${cleanName}`;
       const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);
@@ -92,9 +94,10 @@ export default function BlogPostForm({ existing }: { existing?: BlogPost }) {
 
       let cover = coverUrl;
       if (coverFile) {
-        const cleanName = coverFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+        const wmCover = await watermarkImage(coverFile);
+        const cleanName = wmCover.name.replace(/[^a-zA-Z0-9._-]/g, "-");
         const path = `blog/${Date.now()}-${cleanName}`;
-        const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, coverFile);
+        const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, wmCover);
         if (uploadError) throw new Error(`Image upload failed: ${uploadError.message}`);
         cover = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
       }

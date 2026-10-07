@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { watermarkImage } from "@/lib/watermark";
 import PresetSelect from "@/components/admin/PresetSelect";
 import SeoFields from "@/components/admin/SeoFields";
 import {
@@ -247,7 +248,7 @@ export default function EditProductPage() {
         const keepCount = existingImages.filter((i) => !i.markedForDelete).length;
         const rows = [];
         for (let i = 0; i < newImageFiles.length; i++) {
-          const { file } = newImageFiles[i];
+          const file = await watermarkImage(newImageFiles[i].file);
           const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
           const path = `${productId}/${Date.now()}-${cleanName}`;
           const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file);

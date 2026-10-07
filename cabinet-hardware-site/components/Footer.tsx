@@ -3,9 +3,9 @@ import { REGIONS, WHOLESALE_HUB_SLUG } from "@/lib/regions";
 
 export default function Footer({ categories = [] }: { categories?: { name: string; slug: string }[] }) {
   return (
-    <footer className="px-3 pb-6 pt-16">
-      <div className="mx-auto max-w-[1500px] rounded-2xl bg-blacknickel px-8 py-14 text-stone shadow-lg md:px-12">
-        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
+    <footer className="px-3 pb-4 pt-10">
+      <div className="mx-auto max-w-[1500px] rounded-2xl bg-blacknickel px-8 py-8 text-stone shadow-lg md:px-12">
+        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
               <img src="/logo.png?v=3" alt="Shahid Iqbal & Co logo" className="h-10 w-10" />
@@ -65,20 +65,23 @@ export default function Footer({ categories = [] }: { categories?: { name: strin
               <li><Link href="/contact" className="hover:text-brass">Contact &amp; bulk enquiries</Link></li>
               <li><Link href={`/blog/${WHOLESALE_HUB_SLUG}`} className="hover:text-brass">Wholesale supplier</Link></li>
             </ul>
-            <p className="mb-2 mt-5 text-stone/50">We supply from Lahore to</p>
-            <ul className="space-y-1.5 text-stone/80">
-              {REGIONS.map((r) => (
-                <li key={r.slug}>
-                  <Link href={`/blog/${r.slug}`} className="hover:text-brass">{r.name}</Link>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
 
-        <p className="mt-12 border-t border-stone/10 pt-6 font-body text-xs text-stone/40">
-          © {new Date().getFullYear()} Shahid Iqbal &amp; Co. All rights reserved.
-        </p>
+        <div className="mt-8 border-t border-stone/10 pt-4 font-body text-xs text-stone/50">
+          <p className="leading-relaxed">
+            <span className="text-stone/40">We supply from Lahore to: </span>
+            {REGIONS.map((r, i) => (
+              <span key={r.slug}>
+                <Link href={`/blog/${r.slug}`} className="hover:text-brass">{r.name}</Link>
+                {i < REGIONS.length - 1 && <span className="px-1.5 text-stone/30">·</span>}
+              </span>
+            ))}
+          </p>
+          <p className="mt-2 text-stone/40">
+            © {new Date().getFullYear()} Shahid Iqbal &amp; Co. All rights reserved.
+          </p>
+        </div>
       </div>
     </footer>
   );
