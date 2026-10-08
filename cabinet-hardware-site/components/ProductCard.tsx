@@ -27,7 +27,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <div>
           <p className="font-body text-base text-ink">{product.name}</p>
           <p className="mt-0.5 font-body text-sm text-graphite">
-            From Rs. {product.base_price.toLocaleString()}
+            {product.base_price > 0 ? `From Rs. ${product.base_price.toLocaleString()}` : "Ask for price on WhatsApp"}
           </p>
         </div>
         {totalStock <= 0 && (

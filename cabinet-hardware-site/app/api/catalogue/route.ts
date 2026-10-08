@@ -1,4 +1,4 @@
-﻿// app/api/catalogue/route.ts
+// app/api/catalogue/route.ts
 //
 // GET /api/catalogue → generates and streams back a PDF built from
 // whatever products/variants were live in Supabase as of the last

@@ -1,4 +1,4 @@
-﻿# Onboarding Guide — Shahid Iqbal & Co Website
+# Onboarding Guide — Shahid Iqbal & Co Website
 **Updated: September 2026, after a live audit + three shipped fixes**
 **Owner: Shahid Iqbal (non-technical — read "Working with the owner" before doing anything else)**
 

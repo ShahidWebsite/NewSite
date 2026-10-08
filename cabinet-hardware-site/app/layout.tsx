@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
@@ -23,11 +23,11 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Cabinet Handles & Knobs Wholesale in Pakistan — Lahore | Shahid Iqbal & Co",
+    default: "Cabinet Handles & Knobs in Lahore & All Pakistan | Shahid Iqbal & Co",
     template: "%s",
   },
   description:
-    "Wholesale and retail cabinet handles, knobs, door handles and furniture hardware from Lahore. Supplying hardware shops across Punjab, Sindh, AJK, KPK and Islamabad. Specialized in brass.",
+    "Cabinet handles, knobs, door handles and furniture pulls, specialized in brass. Shop in Lahore on Ferozepur Road or order online with delivery all over Pakistan. Bank transfer or COD. Wholesale rates for hardware shops.",
   applicationName: BRAND,
   verification: { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION },
   // Fallback social-share card for any page that doesn't set its own.
@@ -60,8 +60,8 @@ const localBusinessJsonLd = {
   logo: `${SITE_URL}/logo.png`,
   image: `${SITE_URL}/logo.png`,
   description:
-    "Cabinet and furniture hardware supplier in Lahore, Pakistan. Wholesale and retail cabinet handles, knobs, door handles and furniture hardware for hardware shops and trade customers across Punjab, Sindh, Azad Kashmir, Khyber Pakhtunkhwa and Islamabad.",
-  knowsAbout: ["wholesale cabinet handles", "cabinet knobs", "brass door handles", "furniture hardware"],
+    "Cabinet handles, knobs, door handles and furniture hardware shop on Ferozepur Road, Lahore, delivering all over Pakistan. Specialized in brass. Retail and wholesale.",
+  knowsAbout: ["cabinet handles", "cabinet knobs", "brass door handles", "furniture hardware"],
   areaServed: [
     { "@type": "Country", name: "Pakistan" },
     ...AREA_REGIONS.map((name) => ({ "@type": "AdministrativeArea", name })),

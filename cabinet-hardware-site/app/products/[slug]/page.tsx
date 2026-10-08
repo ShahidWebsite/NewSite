@@ -1,4 +1,4 @@
-﻿import { cache } from "react";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { supabase } from "@/lib/supabase";

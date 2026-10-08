@@ -1,4 +1,4 @@
-﻿// lib/catalogue-data.ts
+// lib/catalogue-data.ts
 //
 // Fetches the CURRENT active product catalogue straight from Supabase,
 // grouped by category (in the order your categories.sort_order defines).

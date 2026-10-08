@@ -4,14 +4,15 @@ import { supabase } from "@/lib/supabase";
 import BlogCard from "@/components/BlogCard";
 import { BlogPost } from "@/lib/types";
 import { BRAND, SITE_URL, pageMetadata } from "@/lib/seo";
+import { NOINDEX_REGION_SLUGS } from "@/lib/regions";
 
 // Re-check for new posts every minute (no redeploy needed after publishing).
 export const revalidate = 60;
 
 export const metadata: Metadata = pageMetadata({
-  title: `Wholesale & Buying Guides: Handles, Knobs, Hardware | ${BRAND}`,
+  title: `Cabinet Handle & Knob Buying Guides — Lahore & Pakistan | ${BRAND}`,
   description:
-    "Guides for hardware shops and home owners in Pakistan: wholesale ordering, what to stock, hole spacing, sizes, materials and finishes. From our Lahore hardware supplier.",
+    "Plain-language guides on hole spacing, sizes, materials and finishes for cabinet handles, knobs and door handles, from our Lahore hardware shop, delivering all over Pakistan.",
   path: "/blog",
 });
 
@@ -22,7 +23,7 @@ export default async function BlogIndexPage() {
     .eq("published", true)
     .order("published_at", { ascending: false });
 
-  const posts = (data ?? []) as Pick<
+  const posts = ((data ?? []).filter((b: any) => !NOINDEX_REGION_SLUGS.includes(b.slug))) as Pick<
     BlogPost,
     "slug" | "title" | "tag" | "excerpt" | "cover_image_url" | "content" | "published_at"
   >[];

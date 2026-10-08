@@ -1,6 +1,7 @@
-﻿import { MetadataRoute } from "next";
+import { MetadataRoute } from "next";
 import { supabase } from "@/lib/supabase";
 import { SITE_URL } from "@/lib/seo";
+import { NOINDEX_REGION_SLUGS } from "@/lib/regions";
 
 // Rebuilt at most once an hour, so new products and guides reach Google without a redeploy.
 export const revalidate = 3600;
@@ -39,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const blogPages: MetadataRoute.Sitemap = (posts ?? []).map((p) => ({
+  const blogPages: MetadataRoute.Sitemap = (posts ?? []).filter((p) => !NOINDEX_REGION_SLUGS.includes(p.slug)).map((p) => ({
     url: `${SITE_URL}/blog/${p.slug}`,
     lastModified: new Date(p.updated_at || p.published_at || Date.now()),
     changeFrequency: "monthly",

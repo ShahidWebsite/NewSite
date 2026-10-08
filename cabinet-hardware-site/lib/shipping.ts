@@ -1,4 +1,4 @@
-﻿// Weight-based COD shipping via Leopard Courier.
+// Weight-based COD shipping via Leopard Courier.
 //
 // How it works: every product stores its shipping weight in grams
 // (`weight_grams`). At checkout, we sum weight × quantity across the cart,

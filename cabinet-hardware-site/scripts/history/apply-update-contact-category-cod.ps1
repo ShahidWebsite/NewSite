@@ -1,4 +1,4 @@
-﻿# ============================================================================
+# ============================================================================
 # Update script: Contact/Bulk Enquiry page, clean category URLs, and
 # Cash on Delivery (Leopard Courier, weight-based shipping).
 #

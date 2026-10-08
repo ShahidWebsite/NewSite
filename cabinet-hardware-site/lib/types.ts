@@ -1,4 +1,4 @@
-﻿export type Category = {
+export type Category = {
   id: string;
   name: string;
   slug: string;

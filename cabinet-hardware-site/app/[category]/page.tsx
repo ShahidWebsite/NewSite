@@ -1,9 +1,10 @@
-﻿import { Metadata } from "next";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import ShopBrowser from "@/components/ShopBrowser";
 import { getCategories, getFilterOptions, getProducts, PAGE_SIZE } from "@/lib/shop-data";
 import { BRAND, pageMetadata } from "@/lib/seo";
+import { categoryCopy } from "@/lib/category-copy";
 
 // Clean, SEO-friendly category URLs: /cabinet-handles, /cabinet-knobs, etc.
 // Next.js always matches a static route (like /about or /shop) before
@@ -37,8 +38,8 @@ export async function generateMetadata({
   }
 
   return pageMetadata({
-    title: `${category.name} — Wholesale & Retail, Lahore | ${BRAND}`,
-    description: `${category.name} wholesale and retail from Lahore — brass, chrome and matte black in every standard size. Supplying hardware shops across Pakistan. Bank transfer or COD.`,
+    title: `${category.name} in Lahore & Pakistan — Buy Online | ${BRAND}`,
+    description: `Buy ${category.name.toLowerCase()} in Lahore or anywhere in Pakistan — brass, chrome and matte black in every standard size. Exact specs on every listing. Bank transfer or COD, delivered nationwide.`,
     path: basePath,
   });
 }
@@ -61,7 +62,11 @@ export default async function CategoryPage({
     getProducts(category.slug, searchParams.color, searchParams.size, searchParams.q, searchParams.sort, limit),
   ]);
 
+  const copy = categoryCopy(category.slug, category.name);
+  const showCopy = !searchParams.q && !searchParams.color && !searchParams.size;
+
   return (
+    <>
     <ShopBrowser
       basePath={`/${category.slug}`}
       heading={searchParams.q ? `Results for "${searchParams.q}"` : category.name}
@@ -76,5 +81,16 @@ export default async function CategoryPage({
       sort={searchParams.sort}
       limit={limit}
     />
+    {showCopy && (
+      <section className="mx-auto max-w-[1500px] px-3 pb-12">
+        <div className="max-w-3xl border-t border-nickel/30 pt-8">
+          <h2 className="font-display text-2xl text-ink">{copy.heading}</h2>
+          {copy.paragraphs.map((t, i) => (
+            <p key={i} className="mt-3 font-body text-graphite">{t}</p>
+          ))}
+        </div>
+      </section>
+    )}
+    </>
   );
 }

@@ -1,4 +1,4 @@
-﻿// Adds the Shahid Iqbal & Co logo as a light watermark to a photo, in the
+// Adds the Shahid Iqbal & Co logo as a light watermark to a photo, in the
 // browser, BEFORE it is uploaded. Every admin upload goes through this, so
 // nothing reaches the store without the logo on it.
 

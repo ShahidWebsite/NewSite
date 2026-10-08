@@ -1,4 +1,4 @@
-﻿# ============================================================================
+# ============================================================================
 # Speed fix: homepage + product pages were either re-fetching from the
 # database on every single visit (homepage), or getting cached forever with
 # no way for admin edits to reach the live site (product pages). This

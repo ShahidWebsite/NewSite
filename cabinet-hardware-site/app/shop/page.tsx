@@ -1,4 +1,4 @@
-﻿import { Metadata } from "next";
+import { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import ShopBrowser from "@/components/ShopBrowser";
@@ -21,9 +21,9 @@ export async function generateMetadata({
   }
 
   return pageMetadata({
-    title: `Cabinet Handles & Knobs — Wholesale & Retail | ${BRAND}`,
+    title: `Shop Cabinet Handles & Knobs — Lahore & Pakistan | ${BRAND}`,
     description:
-      "Cabinet handles, knobs and drawer pulls in brass, chrome and matte black, every size specified. Wholesale and retail from Lahore, delivered across Pakistan.",
+      "Buy cabinet handles, knobs and drawer pulls in Lahore or anywhere in Pakistan — brass, chrome and matte black, every size specified. Bank transfer or COD, nationwide delivery.",
     path: "/shop",
   });
 }

@@ -107,6 +107,29 @@ export function truncateAtWord(text: string, max: number) {
   return `${(lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[.,;:\s-]+$/, "")}…`;
 }
 
+// Auto-generated names sometimes repeat themselves ("Brass Brass Knob / Antique Knob
+// Brass Knob / Antique Knob"). This tidies the repeats for titles and descriptions
+// without touching the stored name or the URL.
+export function cleanProductName(name?: string | null) {
+  // Collapse a phrase that is simply written twice in a row ("X Y / Z X Y / Z").
+  let text = clean(name);
+  for (let n = 0; n < 5; n++) {
+    const collapsed = text.replace(/(\S.{5,}?)\s+\1(?=\s|$)/i, "$1");
+    if (collapsed === text) break;
+    text = collapsed;
+  }
+  const words = text.split(" ");
+  const noRepeatWords = words.filter((w, i) => i === 0 || w.toLowerCase() !== words[i - 1].toLowerCase());
+  const seen = new Set<string>();
+  const parts = noRepeatWords.join(" ").split(/\s*\/\s*/).filter((seg) => {
+    const k = seg.toLowerCase();
+    if (!k || seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  return parts.join(" / ");
+}
+
 // "Cabinet Handles" -> "Cabinet Handle"; "Cabinet Knob" stays as is.
 export function singularize(phrase: string) {
   const p = clean(phrase);
@@ -191,21 +214,23 @@ export function looksLikeCode(name?: string | null) {
 }
 
 export function generateSeoTitle(i: ProductSeoInput) {
-  const name = clean(i.name);
+  const name = cleanProductName(i.name);
   const candidates = [
     `${name} — Buy in Lahore, Pakistan | ${BRAND}`,
+    `${name} in Lahore & Pakistan | ${BRAND}`,
+    `${name} in Lahore | ${BRAND}`,
     `${name} — Buy Online | ${BRAND}`,
     `${name} | ${BRAND}`,
   ];
-  return candidates.find((c) => c.length <= 60) ?? truncateAtWord(candidates[2], 60);
+  return candidates.find((c) => c.length <= 60) ?? truncateAtWord(candidates[4], 60);
 }
 
 export function generateSeoDescription(i: ProductSeoInput) {
-  const name = clean(i.name);
+  const name = cleanProductName(i.name);
   const finishes = (i.finishes ?? []).map(clean).filter(Boolean);
   const sizes = (i.sizes ?? []).map(clean).filter(Boolean);
 
-  let out = `${name} — wholesale and retail from ${BRAND}, Lahore.`;
+  let out = `Buy ${name} in Lahore or anywhere in Pakistan from ${BRAND}.`;
   const extras: string[] = [];
   if (i.material) extras.push(`${clean(i.material)} construction.`);
   if (finishes.length) extras.push(`${finishes.length > 1 ? "Finishes" : "Finish"}: ${joinList(finishes)}.`);
@@ -220,12 +245,12 @@ export function generateSeoDescription(i: ProductSeoInput) {
 }
 
 export function generateProductDescription(i: ProductSeoInput) {
-  const name = clean(i.name) || "This product";
+  const name = cleanProductName(i.name) || "This product";
   const finishes = (i.finishes ?? []).map(clean).filter(Boolean);
   const sizes = (i.sizes ?? []).map(clean).filter(Boolean);
   const kind = productKind(i.categoryName, i.name);
 
-  let p1 = `${name} is available from ${BRAND} in Lahore`;
+  let p1 = `${name} is available from ${BRAND} in Lahore, with delivery all over Pakistan`;
   if (finishes.length) p1 += `, in ${joinList(finishes)} ${finishes.length > 1 ? "finishes" : "finish"}`;
   if (sizes.length) p1 += `${finishes.length ? " and" : ","} in ${sizes.length > 1 ? "sizes" : "size"} ${joinList(sizes)}`;
   p1 += ".";
@@ -237,7 +262,7 @@ export function generateProductDescription(i: ProductSeoInput) {
   const p2 = specBits.length ? `${specBits.join(", ").replace(/^./, (c) => c.toUpperCase())}.` : "";
 
   const p3 = fitTip(kind);
-  const p4 = `We supply hardware shops, carpenters and contractors across Pakistan as well as retail customers. Order online with bank transfer or Cash on Delivery, or WhatsApp us on ${PHONE} for wholesale and trade prices.`;
+  const p4 = `Order online with bank transfer or Cash on Delivery, or WhatsApp us on ${PHONE}. Wholesale rates are available for hardware shops.`;
 
   return [[p1, p2].filter(Boolean).join(" "), p3, p4].join("\n\n");
 }

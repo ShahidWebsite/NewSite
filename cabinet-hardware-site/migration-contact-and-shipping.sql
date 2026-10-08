@@ -1,4 +1,4 @@
-﻿-- ============================================================================
+-- ============================================================================
 -- Adds: 1) Contact / Bulk Enquiry form storage, 2) weight-based shipping
 -- settings for the new Cash on Delivery (Leopard Courier) option, and
 -- 3) the columns needed to record that shipping fee on each order.

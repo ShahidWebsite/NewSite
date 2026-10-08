@@ -1,4 +1,4 @@
-﻿import { cache } from "react";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { Markdown, extractFaqs, extractHeadings, firstParagraph, readingMinutes } from "@/lib/markdown";
 import ShareButtons from "@/components/ShareButtons";
 import BlogCard from "@/components/BlogCard";
+import { NOINDEX_REGION_SLUGS } from "@/lib/regions";
 import { BlogPost } from "@/lib/types";
 import {
   BRAND,
@@ -48,6 +49,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     image: post.cover_image_url || ogImageUrl({ title: post.title, tag: post.tag || undefined }),
     imageAlt: post.title,
     type: "article",
+    noindex: NOINDEX_REGION_SLUGS.includes(post.slug),
     publishedTime: post.published_at || post.created_at,
     modifiedTime: post.updated_at,
   });
@@ -187,7 +189,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             {categories.map((c) => (
               <Link
                 key={c.slug}
-                href={`/shop?category=${c.slug}`}
+                href={`/${c.slug}`}
                 className="border border-ink px-4 py-2 font-body text-sm text-ink hover:bg-ink hover:text-stone"
               >
                 {c.name}

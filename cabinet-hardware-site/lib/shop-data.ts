@@ -1,4 +1,4 @@
-﻿import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { Product } from "@/lib/types";
 
 export const PAGE_SIZE = 12;
@@ -16,7 +16,10 @@ export async function getFilterOptions() {
     .order("value");
 
   const colors = (data ?? []).filter((v: any) => v.attributes?.name === "Finish");
-  const sizes = (data ?? []).filter((v: any) => v.attributes?.name === "Size");
+  // Only clean, single sizes ("128mm", "4 inch"); hides junk like "2000", long lists and weights.
+  const sizes = (data ?? []).filter(
+    (v: any) => v.attributes?.name === "Size" && /^\d+(\.\d+)?\s*(mm|inch|in|cm)$/i.test(String(v.value).trim())
+  );
   return { colors, sizes };
 }
 
@@ -110,6 +113,12 @@ export async function getProducts(
       attribute_value_ids: (v.variant_attribute_values ?? []).map((j: any) => j.attribute_value_id),
     })),
   }));
+
+  // Default "Newest" view: items that can be bought first, sold-out last (stable order otherwise).
+  if (sort !== "price_asc" && sort !== "price_desc") {
+    const inStock = (p: any) => p.variants.some((v: any) => (v.stock_qty ?? 0) > 0);
+    products.sort((a: any, b: any) => Number(inStock(b)) - Number(inStock(a)));
+  }
 
   return { products, hasMore };
 }

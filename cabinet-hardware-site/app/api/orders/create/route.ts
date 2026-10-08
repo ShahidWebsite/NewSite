@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServiceClient } from "@/lib/supabase";
 import { calculateShippingFee, DEFAULT_SHIPPING_SETTINGS, FALLBACK_ITEM_WEIGHT_GRAMS } from "@/lib/shipping";
 

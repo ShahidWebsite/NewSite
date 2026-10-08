@@ -1,9 +1,9 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { pageMetadata } from "@/lib/seo";
-import { REGIONS, WHOLESALE_HUB_SLUG } from "@/lib/regions";
+import { LAHORE_GUIDE_SLUG, NOINDEX_REGION_SLUGS, WHOLESALE_HUB_SLUG } from "@/lib/regions";
 import ProductCard from "@/components/ProductCard";
 import Testimonials from "@/components/Testimonials";
 import Reveal from "@/components/Reveal";
@@ -11,9 +11,9 @@ import BlogCard from "@/components/BlogCard";
 import { BlogPost, Product } from "@/lib/types";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Cabinet Handles & Knobs Wholesale in Pakistan — Lahore | Shahid Iqbal & Co",
+  title: "Cabinet Handles & Knobs in Lahore & All Pakistan | Shahid Iqbal & Co",
   description:
-    "Wholesale and retail cabinet handles, knobs and brass door handles from Lahore. Supplying hardware shops in Punjab, Sindh, AJK, KPK and Islamabad. Trade rates on WhatsApp.",
+    "Brass door handles, cabinet handles, knobs and furniture pulls. Shop in Lahore or order online with delivery all over Pakistan. Exact specs on every listing, bank transfer or COD. Wholesale rates for shops.",
   path: "/",
 });
 
@@ -30,11 +30,15 @@ async function getFeaturedProducts(): Promise<Product[]> {
     .select("*, product_images(*), product_variants(*, variant_attribute_values(attribute_value_id))")
     .eq("status", "active")
     .order("created_at", { ascending: false })
-    .limit(8);
+    .limit(30);
 
   if (!data) return [];
 
-  return data.map((p: any) => ({
+  // Show products that can actually be bought first; sold-out items go last.
+  const stockOf = (p: any) => (p.product_variants ?? []).reduce((n: number, v: any) => n + (v.stock_qty ?? 0), 0);
+  const ordered = [...data].sort((a: any, b: any) => Number(stockOf(b) > 0) - Number(stockOf(a) > 0)).slice(0, 8);
+
+  return ordered.map((p: any) => ({
     ...p,
     images: (p.product_images ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order),
     variants: (p.product_variants ?? []).map((v: any) => ({
@@ -50,8 +54,8 @@ async function getLatestPosts(): Promise<Pick<BlogPost, "slug" | "title" | "tag"
     .select("slug, title, tag, excerpt, cover_image_url, content")
     .eq("published", true)
     .order("published_at", { ascending: false })
-    .limit(3);
-  return data ?? [];
+    .limit(12);
+  return (data ?? []).filter((b) => !NOINDEX_REGION_SLUGS.includes(b.slug)).slice(0, 3);
 }
 
 async function getCategories() {
@@ -71,13 +75,14 @@ export default async function HomePage() {
           <div>
             <p className="font-body text-sm text-brass">Dream Hardware at your Door Step</p>
             <h1 className="mt-4 font-display text-5xl leading-[1.05] md:text-6xl">
-              Cabinet handles &amp; knobs, wholesale and retail from Lahore.
+              Cabinet handles &amp; knobs in Lahore, delivered all over Pakistan.
             </h1>
             <p className="mt-6 max-w-prose font-body text-stone/70">
-              We supply hardware shops, carpenters and contractors across Pakistan,
-              and sell to retail customers too. Cabinet handles, knobs, door handles
-              and furniture pulls, specialized in brass. Every listing shows the
-              exact hole spacing before you order.
+              Visit our shop on Ferozepur Road, Lahore, or order online from anywhere
+              in Pakistan with bank transfer or Cash on Delivery. Cabinet handles,
+              knobs, door handles and furniture pulls, specialized in brass. Every
+              listing shows the exact hole spacing before you order. Hardware shops
+              and carpenters can ask for wholesale rates.
             </p>
             <div className="mt-8 flex gap-4">
               <Link
@@ -181,32 +186,24 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Pakistan-wide wholesale coverage — real text + internal links to the regional guides */}
+      {/* Lahore first, Pakistan-wide: short natural text, no keyword-stuffed region grid */}
       <section className="mx-auto max-w-[1500px] px-3 py-10">
         <Reveal>
-          <h2 className="font-display text-3xl text-ink">Wholesale cabinet handles &amp; knobs, supplied across Pakistan</h2>
+          <h2 className="font-display text-3xl text-ink">Based in Lahore, delivering all over Pakistan</h2>
           <p className="mt-3 max-w-3xl font-body text-graphite">
-            Shahid Iqbal &amp; Co deals from Lahore and ships to hardware shops and trade customers in
-            Punjab, Sindh, Azad Kashmir, Khyber Pakhtunkhwa and Islamabad. Most of our customers are
-            hardware shops; single pieces and small orders are welcome at retail.{" "}
-            <Link href={`/blog/${WHOLESALE_HUB_SLUG}`} className="text-ink underline hover:text-brass">
-              How wholesale works
+            In Lahore? Visit Shahid Iqbal &amp; Co at 218/18 Ferozepur Road, near WAPDA Hospital, or order
+            online.{" "}
+            <Link href={`/blog/${LAHORE_GUIDE_SLUG}`} className="text-ink underline hover:text-brass">
+              Where to buy in Lahore
             </Link>
+            . Outside Lahore? We send orders to Islamabad, Karachi, Faisalabad, Multan, Peshawar and every other
+            city in Pakistan, by bank transfer or Cash on Delivery. Hardware shop or trade buyer?{" "}
+            <Link href={`/blog/${WHOLESALE_HUB_SLUG}`} className="text-ink underline hover:text-brass">
+              See how wholesale works
+            </Link>
+            .
           </p>
         </Reveal>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          {REGIONS.map((r, i) => (
-            <Reveal key={r.slug} delay={i * 50}>
-              <Link
-                href={`/blog/${r.slug}`}
-                className="block h-full border border-nickel/30 px-5 py-4 transition-colors hover:border-brass"
-              >
-                <p className="font-display text-lg text-ink">Cabinet handles — {r.name}</p>
-                <p className="mt-1 font-body text-sm text-graphite">{r.cities}</p>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
       </section>
 
       {/* Trust / specs section */}

@@ -1,4 +1,4 @@
-﻿# ============================================================================
+# ============================================================================
 # Update 13 - SEO fixes + automatic SEO content + Guides (blog) + social share images
 #
 # BEFORE running this: paste migration-13-seo-and-blog.sql into Supabase SQL Editor and click Run.

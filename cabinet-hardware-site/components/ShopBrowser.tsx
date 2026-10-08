@@ -1,4 +1,4 @@
-﻿import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/ProductCard";
 import SortSelect from "@/components/SortSelect";
 import { Product } from "@/lib/types";
 import { PAGE_SIZE } from "@/lib/shop-data";

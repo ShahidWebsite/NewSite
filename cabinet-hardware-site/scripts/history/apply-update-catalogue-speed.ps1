@@ -1,4 +1,4 @@
-﻿# ============================================================================
+# ============================================================================
 # Speed fix: the "Download Catalogue" PDF was being rebuilt completely from
 # scratch on every single click -- re-downloading every product photo over
 # the network and re-rendering the whole PDF -- with zero caching. This

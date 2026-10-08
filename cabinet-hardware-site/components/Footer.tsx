@@ -1,5 +1,5 @@
-﻿import Link from "next/link";
-import { REGIONS, WHOLESALE_HUB_SLUG } from "@/lib/regions";
+import Link from "next/link";
+import { LAHORE_GUIDE_SLUG, WHOLESALE_HUB_SLUG } from "@/lib/regions";
 
 export default function Footer({ categories = [] }: { categories?: { name: string; slug: string }[] }) {
   return (
@@ -12,9 +12,9 @@ export default function Footer({ categories = [] }: { categories?: { name: strin
               <p className="font-display text-xl">Shahid Iqbal &amp; Co</p>
             </div>
             <p className="mt-3 max-w-prose font-body text-sm text-stone/70">
-              Dream Hardware at your Door Step — wholesale and retail cabinet
-              handles, knobs, door handles and furniture pulls from Lahore,
-              specialized in brass. Serving hardware shops across Pakistan.
+              Dream Hardware at your Door Step — cabinet handles, knobs, door
+              handles and furniture pulls, specialized in brass. Based in Lahore,
+              delivering all over Pakistan, wholesale rates for hardware shops.
             </p>
             <ul className="mt-4 font-body text-sm">
               <li><Link href="/about" className="hover:text-brass">About us</Link></li>
@@ -70,13 +70,7 @@ export default function Footer({ categories = [] }: { categories?: { name: strin
 
         <div className="mt-8 border-t border-stone/10 pt-4 font-body text-xs text-stone/50">
           <p className="leading-relaxed">
-            <span className="text-stone/40">We supply from Lahore to: </span>
-            {REGIONS.map((r, i) => (
-              <span key={r.slug}>
-                <Link href={`/blog/${r.slug}`} className="hover:text-brass">{r.name}</Link>
-                {i < REGIONS.length - 1 && <span className="px-1.5 text-stone/30">·</span>}
-              </span>
-            ))}
+            <Link href={`/blog/${LAHORE_GUIDE_SLUG}`} className="hover:text-brass">Cabinet handles &amp; knobs in Lahore — where to buy</Link>
           </p>
           <p className="mt-2 text-stone/40">
             © {new Date().getFullYear()} Shahid Iqbal &amp; Co. All rights reserved.

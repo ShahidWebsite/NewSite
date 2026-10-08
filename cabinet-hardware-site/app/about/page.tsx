@@ -2,9 +2,9 @@ import { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: 'About Shahid Iqbal & Co — Hardware Wholesaler in Lahore, Pakistan',
+  title: 'About Shahid Iqbal & Co — Hardware Shop in Lahore, Delivering Pakistan-wide',
   description:
-    'Shahid Iqbal & Co is a Lahore cabinet and furniture hardware wholesaler and retailer, specializing in brass. We supply hardware shops across Pakistan. Visit us on Ferozepur Road.',
+    'Shahid Iqbal & Co is a Lahore hardware shop specializing in brass door handles, cabinet handles, knobs and furniture pulls. Visit us on Ferozepur Road or order online from anywhere in Pakistan. Wholesale rates for hardware shops.',
   path: '/about',
 });
 
