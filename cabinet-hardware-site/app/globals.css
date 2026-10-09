@@ -31,3 +31,59 @@ select:focus-visible {
   outline: 2px solid #a9832e;
   outline-offset: 2px;
 }
+
+/* ------------------------------------------------------------------
+   Motion additions. Purely visual: no layout, colour or content changes.
+   Each effect is switched off for visitors who prefer reduced motion.
+   ------------------------------------------------------------------ */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Slide only (no fade) so the main heading is never invisible: keeps LCP fast. */
+@keyframes rise-lcp {
+  from { transform: translateY(12px); }
+  to   { transform: none; }
+}
+@keyframes page-in {
+  from { opacity: 0.55; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes bump {
+  40% { transform: scale(1.18); }
+}
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.rise {
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+.rise-lcp { animation: rise-lcp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.page-in  { animation: page-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.fade-in  { animation: fade-in 0.35s ease-out both; }
+.bump     { animation: bump 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.menu-in  { animation: menu-in 0.25s ease-out both; }
+
+/* Thin underline that slides in on hover (desktop navigation). */
+.link-slide {
+  background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
+  padding-bottom: 3px;
+  transition: background-size 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s;
+}
+.link-slide:hover { background-size: 100% 1px; }
+
+/* Buttons press down slightly. */
+.press:active { transform: scale(0.98); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .rise-lcp, .page-in, .fade-in, .bump, .menu-in { animation: none; }
+  .link-slide { transition: none; }
+  .press:active { transform: none; }
+}

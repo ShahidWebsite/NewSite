@@ -33,12 +33,12 @@ export default function Header({ categories = [] }: { categories?: { name: strin
         </Link>
 
         <nav className="hidden items-center gap-8 font-body text-sm text-graphite md:flex">
-          <Link href="/shop" className="hover:text-ink">Shop</Link>
+          <Link href="/shop" className="link-slide hover:text-ink">Shop</Link>
           {categories.slice(0, 4).map((c) => (
-            <Link key={c.slug} href={`/${c.slug}`} className="hover:text-ink">{c.name}</Link>
+            <Link key={c.slug} href={`/${c.slug}`} className="link-slide hover:text-ink">{c.name}</Link>
           ))}
-          <Link href="/blog" className="hover:text-ink">Guides</Link>
-          <Link href="/track-order" className="hover:text-ink">Track order</Link>
+          <Link href="/blog" className="link-slide hover:text-ink">Guides</Link>
+          <Link href="/track-order" className="link-slide hover:text-ink">Track order</Link>
           <CatalogueDownloadButton />
         </nav>
 
@@ -93,7 +93,10 @@ export default function Header({ categories = [] }: { categories?: { name: strin
             href="/cart"
             className="font-body text-sm text-ink underline decoration-nickel decoration-1 underline-offset-4 hover:decoration-brass"
           >
-            Cart{itemCount > 0 ? ` (${itemCount})` : ""}
+            Cart
+            {itemCount > 0 && (
+              <span key={itemCount} className="bump inline-block">{` (${itemCount})`}</span>
+            )}
           </Link>
           <button
             type="button"
@@ -110,7 +113,7 @@ export default function Header({ categories = [] }: { categories?: { name: strin
       </div>
 
       {menuOpen && (
-        <nav className="flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite md:hidden">
+        <nav className="menu-in flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite md:hidden">
           <Link href="/shop" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Shop</Link>
           {categories.map((c) => (
             <Link key={c.slug} href={`/${c.slug}`} onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">{c.name}</Link>

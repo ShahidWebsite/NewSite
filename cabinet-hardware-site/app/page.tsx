@@ -73,27 +73,27 @@ export default async function HomePage() {
         <div className="mx-auto max-w-[1500px] px-3 pt-6">
         <div className="grid gap-10 rounded-2xl bg-blacknickel px-8 py-12 text-stone shadow-lg md:grid-cols-2 md:items-center md:px-12 md:py-16">
           <div>
-            <p className="font-body text-sm text-brass">Dream Hardware at your Door Step</p>
-            <h1 className="mt-4 font-display text-5xl leading-[1.05] md:text-6xl">
+            <p className="rise font-body text-sm text-brass">Dream Hardware at your Door Step</p>
+            <h1 className="rise-lcp mt-4 font-display text-5xl leading-[1.05] md:text-6xl">
               Cabinet handles &amp; knobs in Lahore, delivered all over Pakistan.
             </h1>
-            <p className="mt-6 max-w-prose font-body text-stone/70">
+            <p className="rise mt-6 max-w-prose font-body text-stone/70" style={{ "--d": "140ms" } as React.CSSProperties}>
               Visit our shop on Ferozepur Road, Lahore, or order online from anywhere
               in Pakistan with bank transfer or Cash on Delivery. Cabinet handles,
               knobs, door handles and furniture pulls, specialized in brass. Every
               listing shows the exact hole spacing before you order. Hardware shops
               and carpenters can ask for wholesale rates.
             </p>
-            <div className="mt-8 flex gap-4">
+            <div className="rise mt-8 flex gap-4" style={{ "--d": "260ms" } as React.CSSProperties}>
               <Link
                 href="/shop"
-                className="bg-brass px-6 py-3 font-body text-sm text-blacknickel transition-colors hover:bg-stone"
+                className="press bg-brass px-6 py-3 font-body text-sm text-blacknickel transition-colors hover:bg-stone"
               >
                 Shop all products
               </Link>
               <Link
                 href="/contact"
-                className="border border-stone/30 px-6 py-3 font-body text-sm text-stone transition-colors hover:border-stone"
+                className="press border border-stone/30 px-6 py-3 font-body text-sm text-stone transition-colors hover:border-stone"
               >
                 Wholesale enquiry
               </Link>
@@ -106,8 +106,13 @@ export default async function HomePage() {
               { name: "Matte Black", hex: "#1C1B19" },
               { name: "Golden", hex: "#A9832E" },
               { name: "Chrome", hex: "#9B9992" },
-            ].map((finish) => (
-              <Link key={finish.name} href={`/shop?color=${encodeURIComponent(finish.name)}`} className="group space-y-3">
+            ].map((finish, i) => (
+              <Link
+                key={finish.name}
+                href={`/shop?color=${encodeURIComponent(finish.name)}`}
+                className="rise group space-y-3"
+                style={{ "--d": `${360 + i * 110}ms` } as React.CSSProperties}
+              >
                 <div
                   className="aspect-square rounded-full border-2 border-stone/40 ring-1 ring-black/20 transition-transform group-hover:scale-105"
                   style={{ backgroundColor: finish.hex }}

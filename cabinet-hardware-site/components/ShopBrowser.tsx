@@ -177,8 +177,14 @@ export default function ShopBrowser({
           ) : (
             <>
               <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-                {products.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                {products.map((p, i) => (
+                  <div
+                    key={p.id}
+                    className="rise"
+                    style={{ "--d": `${Math.min(i, 8) * 55}ms` } as React.CSSProperties}
+                  >
+                    <ProductCard product={p} />
+                  </div>
                 ))}
               </div>
               {hasMore && (

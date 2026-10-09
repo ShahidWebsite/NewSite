@@ -1,0 +1,244 @@
+diff --git a/cabinet-hardware-site/app/globals.css b/cabinet-hardware-site/app/globals.css
+index 8e7864c..199b166 100644
+--- a/cabinet-hardware-site/app/globals.css
++++ b/cabinet-hardware-site/app/globals.css
+@@ -31,3 +31,59 @@ select:focus-visible {
+   outline: 2px solid #a9832e;
+   outline-offset: 2px;
+ }
++
++/* ------------------------------------------------------------------
++   Motion additions. Purely visual: no layout, colour or content changes.
++   Each effect is switched off for visitors who prefer reduced motion.
++   ------------------------------------------------------------------ */
++@keyframes rise {
++  from { opacity: 0; transform: translateY(14px); }
++  to   { opacity: 1; transform: none; }
++}
++/* Slide only (no fade) so the main heading is never invisible: keeps LCP fast. */
++@keyframes rise-lcp {
++  from { transform: translateY(12px); }
++  to   { transform: none; }
++}
++@keyframes page-in {
++  from { opacity: 0.55; transform: translateY(6px); }
++  to   { opacity: 1; transform: none; }
++}
++@keyframes fade-in {
++  from { opacity: 0; }
++  to   { opacity: 1; }
++}
++@keyframes bump {
++  40% { transform: scale(1.18); }
++}
++@keyframes menu-in {
++  from { opacity: 0; transform: translateY(-6px); }
++  to   { opacity: 1; transform: none; }
++}
++
++.rise {
++  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
++  animation-delay: var(--d, 0ms);
++}
++.rise-lcp { animation: rise-lcp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
++.page-in  { animation: page-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
++.fade-in  { animation: fade-in 0.35s ease-out both; }
++.bump     { animation: bump 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
++.menu-in  { animation: menu-in 0.25s ease-out both; }
++
++/* Thin underline that slides in on hover (desktop navigation). */
++.link-slide {
++  background: linear-gradient(currentColor, currentColor) left bottom / 0 1px no-repeat;
++  padding-bottom: 3px;
++  transition: background-size 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s;
++}
++.link-slide:hover { background-size: 100% 1px; }
++
++/* Buttons press down slightly. */
++.press:active { transform: scale(0.98); }
++
++@media (prefers-reduced-motion: reduce) {
++  .rise, .rise-lcp, .page-in, .fade-in, .bump, .menu-in { animation: none; }
++  .link-slide { transition: none; }
++  .press:active { transform: none; }
++}
+diff --git a/cabinet-hardware-site/app/page.tsx b/cabinet-hardware-site/app/page.tsx
+index 24d1786..8981bd2 100644
+--- a/cabinet-hardware-site/app/page.tsx
++++ b/cabinet-hardware-site/app/page.tsx
+@@ -73,27 +73,27 @@ export default async function HomePage() {
+         <div className="mx-auto max-w-[1500px] px-3 pt-6">
+         <div className="grid gap-10 rounded-2xl bg-blacknickel px-8 py-12 text-stone shadow-lg md:grid-cols-2 md:items-center md:px-12 md:py-16">
+           <div>
+-            <p className="font-body text-sm text-brass">Dream Hardware at your Door Step</p>
+-            <h1 className="mt-4 font-display text-5xl leading-[1.05] md:text-6xl">
++            <p className="rise font-body text-sm text-brass">Dream Hardware at your Door Step</p>
++            <h1 className="rise-lcp mt-4 font-display text-5xl leading-[1.05] md:text-6xl">
+               Cabinet handles &amp; knobs in Lahore, delivered all over Pakistan.
+             </h1>
+-            <p className="mt-6 max-w-prose font-body text-stone/70">
++            <p className="rise mt-6 max-w-prose font-body text-stone/70" style={{ "--d": "140ms" } as React.CSSProperties}>
+               Visit our shop on Ferozepur Road, Lahore, or order online from anywhere
+               in Pakistan with bank transfer or Cash on Delivery. Cabinet handles,
+               knobs, door handles and furniture pulls, specialized in brass. Every
+               listing shows the exact hole spacing before you order. Hardware shops
+               and carpenters can ask for wholesale rates.
+             </p>
+-            <div className="mt-8 flex gap-4">
++            <div className="rise mt-8 flex gap-4" style={{ "--d": "260ms" } as React.CSSProperties}>
+               <Link
+                 href="/shop"
+-                className="bg-brass px-6 py-3 font-body text-sm text-blacknickel transition-colors hover:bg-stone"
++                className="press bg-brass px-6 py-3 font-body text-sm text-blacknickel transition-colors hover:bg-stone"
+               >
+                 Shop all products
+               </Link>
+               <Link
+                 href="/contact"
+-                className="border border-stone/30 px-6 py-3 font-body text-sm text-stone transition-colors hover:border-stone"
++                className="press border border-stone/30 px-6 py-3 font-body text-sm text-stone transition-colors hover:border-stone"
+               >
+                 Wholesale enquiry
+               </Link>
+@@ -106,8 +106,13 @@ export default async function HomePage() {
+               { name: "Matte Black", hex: "#1C1B19" },
+               { name: "Golden", hex: "#A9832E" },
+               { name: "Chrome", hex: "#9B9992" },
+-            ].map((finish) => (
+-              <Link key={finish.name} href={`/shop?color=${encodeURIComponent(finish.name)}`} className="group space-y-3">
++            ].map((finish, i) => (
++              <Link
++                key={finish.name}
++                href={`/shop?color=${encodeURIComponent(finish.name)}`}
++                className="rise group space-y-3"
++                style={{ "--d": `${360 + i * 110}ms` } as React.CSSProperties}
++              >
+                 <div
+                   className="aspect-square rounded-full border-2 border-stone/40 ring-1 ring-black/20 transition-transform group-hover:scale-105"
+                   style={{ backgroundColor: finish.hex }}
+diff --git a/cabinet-hardware-site/app/template.tsx b/cabinet-hardware-site/app/template.tsx
+new file mode 100644
+index 0000000..0289b2e
+--- /dev/null
++++ b/cabinet-hardware-site/app/template.tsx
+@@ -0,0 +1,5 @@
++// Re-mounts on every page change, giving a short fade-and-rise between pages.
++// Server component: adds no JavaScript to the page.
++export default function Template({ children }: { children: React.ReactNode }) {
++  return <div className="page-in">{children}</div>;
++}
+diff --git a/cabinet-hardware-site/components/Header.tsx b/cabinet-hardware-site/components/Header.tsx
+index b1d73fa..e266171 100644
+--- a/cabinet-hardware-site/components/Header.tsx
++++ b/cabinet-hardware-site/components/Header.tsx
+@@ -33,12 +33,12 @@ export default function Header({ categories = [] }: { categories?: { name: strin
+         </Link>
+ 
+         <nav className="hidden items-center gap-8 font-body text-sm text-graphite md:flex">
+-          <Link href="/shop" className="hover:text-ink">Shop</Link>
++          <Link href="/shop" className="link-slide hover:text-ink">Shop</Link>
+           {categories.slice(0, 4).map((c) => (
+-            <Link key={c.slug} href={`/${c.slug}`} className="hover:text-ink">{c.name}</Link>
++            <Link key={c.slug} href={`/${c.slug}`} className="link-slide hover:text-ink">{c.name}</Link>
+           ))}
+-          <Link href="/blog" className="hover:text-ink">Guides</Link>
+-          <Link href="/track-order" className="hover:text-ink">Track order</Link>
++          <Link href="/blog" className="link-slide hover:text-ink">Guides</Link>
++          <Link href="/track-order" className="link-slide hover:text-ink">Track order</Link>
+           <CatalogueDownloadButton />
+         </nav>
+ 
+@@ -93,7 +93,10 @@ export default function Header({ categories = [] }: { categories?: { name: strin
+             href="/cart"
+             className="font-body text-sm text-ink underline decoration-nickel decoration-1 underline-offset-4 hover:decoration-brass"
+           >
+-            Cart{itemCount > 0 ? ` (${itemCount})` : ""}
++            Cart
++            {itemCount > 0 && (
++              <span key={itemCount} className="bump inline-block">{` (${itemCount})`}</span>
++            )}
+           </Link>
+           <button
+             type="button"
+@@ -110,7 +113,7 @@ export default function Header({ categories = [] }: { categories?: { name: strin
+       </div>
+ 
+       {menuOpen && (
+-        <nav className="flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite md:hidden">
++        <nav className="menu-in flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite md:hidden">
+           <Link href="/shop" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Shop</Link>
+           {categories.map((c) => (
+             <Link key={c.slug} href={`/${c.slug}`} onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">{c.name}</Link>
+diff --git a/cabinet-hardware-site/components/ProductGallery.tsx b/cabinet-hardware-site/components/ProductGallery.tsx
+index 1c5f32c..1a9321c 100644
+--- a/cabinet-hardware-site/components/ProductGallery.tsx
++++ b/cabinet-hardware-site/components/ProductGallery.tsx
+@@ -13,20 +13,23 @@ export default function ProductGallery({
+   productName: string;
+ }) {
+   const [activeIndex, setActiveIndex] = useState(0);
++  const [swapped, setSwapped] = useState(false); // fade only after a thumbnail is chosen, never on first load
+   const active = images[activeIndex];
+ 
+   return (
+     <div>
+       <div className="relative aspect-square overflow-hidden bg-nickel/10">
+         {active ? (
+-          <Image
+-            src={active.url}
+-            alt={productImageAlt(productName, activeIndex)}
+-            fill
+-            sizes="(min-width: 768px) 50vw, 100vw"
+-            className="object-cover"
+-            priority={activeIndex === 0}
+-          />
++          <div key={active.id} className={`absolute inset-0 ${swapped ? "fade-in" : ""}`}>
++            <Image
++              src={active.url}
++              alt={productImageAlt(productName, activeIndex)}
++              fill
++              sizes="(min-width: 768px) 50vw, 100vw"
++              className="object-cover"
++              priority={activeIndex === 0}
++            />
++          </div>
+         ) : (
+           <div className="flex h-full w-full items-center justify-center font-display text-2xl italic text-nickel">
+             {productName}
+@@ -40,10 +43,13 @@ export default function ProductGallery({
+             <button
+               key={img.id}
+               type="button"
+-              onClick={() => setActiveIndex(i)}
++              onClick={() => {
++                setSwapped(true);
++                setActiveIndex(i);
++              }}
+               aria-label={`Show image ${i + 1} of ${images.length}`}
+               aria-current={i === activeIndex}
+-              className={`relative h-16 w-16 flex-shrink-0 overflow-hidden border ${
++              className={`press relative h-16 w-16 flex-shrink-0 overflow-hidden border transition-colors ${
+                 i === activeIndex ? "border-ink" : "border-nickel/30 hover:border-nickel"
+               }`}
+             >
+diff --git a/cabinet-hardware-site/components/ShopBrowser.tsx b/cabinet-hardware-site/components/ShopBrowser.tsx
+index a04cd8c..7ef9d53 100644
+--- a/cabinet-hardware-site/components/ShopBrowser.tsx
++++ b/cabinet-hardware-site/components/ShopBrowser.tsx
+@@ -177,8 +177,14 @@ export default function ShopBrowser({
+           ) : (
+             <>
+               <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+-                {products.map((p) => (
+-                  <ProductCard key={p.id} product={p} />
++                {products.map((p, i) => (
++                  <div
++                    key={p.id}
++                    className="rise"
++                    style={{ "--d": `${Math.min(i, 8) * 55}ms` } as React.CSSProperties}
++                  >
++                    <ProductCard product={p} />
++                  </div>
+                 ))}
+               </div>
+               {hasMore && (
