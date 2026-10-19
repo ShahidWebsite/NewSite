@@ -7,6 +7,7 @@ import { BRAND, SITE_URL, ogImageUrl } from "@/lib/seo";
 import { AREA_CITIES, AREA_REGIONS } from "@/lib/regions";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 // Header + footer show your real categories, so new categories appear in the
 // menu automatically. Re-checked at most once a minute.
@@ -115,6 +116,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header categories={categories} />
           <main>{children}</main>
           <Footer categories={categories} />
+          <WhatsAppButton />
         </CartProvider>
       </body>
     </html>

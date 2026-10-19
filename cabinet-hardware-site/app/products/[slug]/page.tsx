@@ -275,7 +275,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
           )}
 
           <div className="mt-8 border-t border-nickel/30 pt-6">
-            <ShareButtons path={`/products/${product.slug}`} text={`${product.name} â€” ${BRAND}`} />
+            <ShareButtons path={`/products/${product.slug}`} text={`${product.name} — ${BRAND}`} />
           </div>
         </div>
       </div>
