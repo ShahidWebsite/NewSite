@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 
-export function CatalogueDownloadButton() {
+export function CatalogueDownloadButton({ variant = 'button' }: { variant?: 'button' | 'link' }) {
   const [loading, setLoading] = useState(false);
 
   async function handleDownload() {
@@ -37,17 +37,30 @@ export function CatalogueDownloadButton() {
     <button
       onClick={handleDownload}
       disabled={loading}
-      style={{
-        backgroundColor: 'transparent',
-        color: '#2A2825',
-        padding: '8px 16px',
-        borderRadius: 999,
-        border: '1px solid #9B9992',
-        fontWeight: 500,
-        fontSize: 14,
-        cursor: loading ? 'default' : 'pointer',
-        opacity: loading ? 0.7 : 1,
-      }}
+      style={
+        variant === 'link'
+          ? {
+              background: 'none',
+              color: 'inherit',
+              padding: 0,
+              border: 'none',
+              font: 'inherit',
+              textDecoration: 'underline',
+              cursor: loading ? 'default' : 'pointer',
+              opacity: loading ? 0.7 : 1,
+            }
+          : {
+              backgroundColor: 'transparent',
+              color: '#2A2825',
+              padding: '8px 16px',
+              borderRadius: 999,
+              border: '1px solid #9B9992',
+              fontWeight: 500,
+              fontSize: 14,
+              cursor: loading ? 'default' : 'pointer',
+              opacity: loading ? 0.7 : 1,
+            }
+      }
     >
       {loading ? 'Preparing catalogue…' : 'Download Catalogue (PDF)'}
     </button>

@@ -73,42 +73,40 @@ const HERO_SIZES = ["64mm", "96mm", "128mm", "160mm", "192mm"];
 
 const TRUST_ITEMS = [
   {
-    icon: (
-      <path
-        d="M4 15L15 4M8 16l-4-4M9 20l3-3M4 11l4 4m5-11l4 4m-8 4l4 4"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    ),
-    title: "Exact specs, every listing",
-    body: "Hole spacing, material, and weight are listed on every product — no guessing before your cabinets arrive.",
+    icon: <path d="M3 9h18M3 15h18M7 5v14M17 5v14" />,
+    title: "Exact hole spacing",
+    body: "Listed on every product, so it fits first time.",
   },
   {
     icon: (
       <>
-        <path d="M3 9l9-5 9 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M5 9v9m4-9v9m4-9v9m4-9v9M3 20h18" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <rect x="3" y="6" width="18" height="12" rx="2" />
+        <circle cx="12" cy="12" r="2.5" />
       </>
     ),
-    title: "Bank transfer accepted",
-    body: "Pay by direct bank transfer with your order number as reference — details are shown at checkout.",
+    title: "Bank transfer or COD",
+    body: "Pay the way you prefer, nationwide.",
   },
   {
     icon: (
       <>
-        <path
-          d="M12 21s7-6.1 7-11.5A7 7 0 105 9.5C5 14.9 12 21 12 21z"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinejoin="round"
-        />
-        <circle cx="12" cy="9.5" r="2.3" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M2 7h12v9H2zM14 10h4l3 3v3h-7" />
+        <circle cx="7" cy="17.5" r="1.8" />
+        <circle cx="17" cy="17.5" r="1.8" />
+      </>
+    ),
+    title: "Delivery all over Pakistan",
+    body: "Islamabad, Karachi, Faisalabad, Multan and beyond.",
+  },
+  {
+    icon: (
+      <>
+        <path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" />
+        <circle cx="12" cy="9.5" r="2.5" />
       </>
     ),
     title: "Track your order",
-    body: "Look up your order anytime with your order number and email to see its current status.",
+    body: "Order number and email, live status.",
   },
 ];
 
@@ -191,17 +189,26 @@ export default async function HomePage() {
 
       {/* Trust strip: same three messages as before, now right under the hero */}
       <section className="mx-auto max-w-[1500px] px-3">
-        <div className="grid border-b border-nickel/25 md:grid-cols-3 md:divide-x md:divide-nickel/25">
+        <div className="grid border-b border-nickel/25 sm:grid-cols-2 md:grid-cols-4 md:divide-x md:divide-nickel/25">
           {TRUST_ITEMS.map((item, i) => (
             <Reveal key={item.title} delay={i * 80}>
-              <div className="flex h-full gap-4 px-2 py-7 md:px-8 md:first:pl-2">
-                <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-brass text-stone shadow-sm">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    {item.icon}
-                  </svg>
-                </span>
+              <div className="flex h-full gap-3.5 px-2 py-7 md:px-6 md:first:pl-2">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mt-0.5 flex-none text-brass"
+                  aria-hidden="true"
+                >
+                  {item.icon}
+                </svg>
                 <div>
-                  <p className="font-display text-xl text-ink">{item.title}</p>
+                  <p className="font-body text-base font-semibold text-ink">{item.title}</p>
                   <p className="mt-1 font-body text-sm text-graphite">{item.body}</p>
                 </div>
               </div>

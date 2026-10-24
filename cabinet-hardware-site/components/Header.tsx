@@ -23,8 +23,23 @@ export default function Header({ categories = [] }: { categories?: { name: strin
   }
 
   return (
-    <header className="sticky top-3 z-40 px-3 pt-3">
-      <div className="mx-auto max-w-[1500px] rounded-2xl border border-nickel/30 bg-stone/90 shadow-[0_10px_30px_-12px_rgba(42,40,37,0.35)] backdrop-blur-md">
+    <>
+      {/* Top information bar (scrolls away; the floating menu below stays) */}
+      <div className="bg-blacknickel font-body text-xs text-stone/75">
+        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-3 py-2.5">
+          <span className="hidden sm:inline">218/18 Ferozepur Road, near WAPDA Hospital, Lahore</span>
+          <span className="flex flex-wrap items-center gap-x-6 gap-y-1">
+            <Link href="/track-order" className="hover:text-stone">Track order</Link>
+            <span className="hover:text-stone"><CatalogueDownloadButton variant="link" /></span>
+            <a href="tel:+923117798157" className="hover:text-stone">+92 311 7798157</a>
+          </span>
+        </div>
+      </div>
+
+    {/* Solid band behind the floating menu, so page content never shows
+        around or through it while scrolling. */}
+    <header className="sticky top-0 z-40 bg-stone px-3 pb-2 pt-3">
+      <div className="mx-auto max-w-[1500px] rounded-2xl border border-nickel/30 bg-[#FBF8F2] shadow-[0_8px_24px_-12px_rgba(42,40,37,0.35)]">
       <div className="flex items-center justify-between gap-4 px-5 py-3">
         <Link href="/" className="flex items-center gap-3">
           <img src="/logo.png?v=3" alt="Shahid Iqbal & Co logo" className="h-11 w-11" />
@@ -39,8 +54,6 @@ export default function Header({ categories = [] }: { categories?: { name: strin
             <Link key={c.slug} href={`/${c.slug}`} className="link-slide hover:text-ink">{c.name}</Link>
           ))}
           <Link href="/blog" className="link-slide hover:text-ink">Guides</Link>
-          <Link href="/track-order" className="link-slide hover:text-ink">Track order</Link>
-          <CatalogueDownloadButton />
         </nav>
 
         <div className="flex items-center gap-4">
@@ -90,6 +103,17 @@ export default function Header({ categories = [] }: { categories?: { name: strin
               </svg>
             </button>
           )}
+          <a
+            href="https://wa.me/923117798157"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden h-10 items-center gap-2 rounded-full bg-blacknickel px-5 font-body text-sm font-medium text-stone transition-colors hover:bg-ink sm:flex"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A24A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z" />
+            </svg>
+            WhatsApp
+          </a>
           <Link
             href="/cart"
             className="flex h-10 items-center gap-2 rounded-full border border-nickel/40 px-4 font-body text-sm text-ink transition-colors hover:border-brass hover:text-brass"
@@ -126,5 +150,6 @@ export default function Header({ categories = [] }: { categories?: { name: strin
       )}
       </div>
     </header>
+    </>
   );
 }
