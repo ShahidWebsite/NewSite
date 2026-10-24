@@ -121,7 +121,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   const jsonLd = { "@context": "https://schema.org", "@graph": graph };
 
   return (
-    <article className="mx-auto max-w-[1400px] px-6 py-16">
+    <article className="mx-auto max-w-[1500px] px-3 py-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <div className="mx-auto max-w-3xl">

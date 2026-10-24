@@ -24,7 +24,13 @@ export default async function Testimonials() {
       <div className="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
         {reviews.map((r, i) => (
           <Reveal key={r.id} delay={i * 80}>
-            <div className="group relative flex h-full flex-col border border-nickel/25 bg-white/60 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brass/60 hover:shadow-[0_12px_30px_-15px_rgba(42,40,37,0.25)]">
+            <div
+              className={`group relative flex h-full flex-col rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_-15px_rgba(42,40,37,0.25)] ${
+                i === 0
+                  ? "border-blacknickel bg-blacknickel text-stone md:p-8"
+                  : "border-nickel/25 bg-white/60 hover:border-brass/60"
+              }`}
+            >
               <span
                 aria-hidden="true"
                 className="font-display text-5xl leading-none text-brass/25 transition-colors duration-300 group-hover:text-brass/40"
@@ -35,12 +41,12 @@ export default async function Testimonials() {
                 {"★".repeat(r.rating)}
                 <span className="text-nickel/40">{"★".repeat(5 - r.rating)}</span>
               </p>
-              <p className="mt-3 flex-1 font-body text-sm leading-relaxed text-graphite">{r.body}</p>
-              <div className="mt-5 flex items-center gap-3 border-t border-nickel/15 pt-4">
+              <p className={`mt-3 flex-1 font-body leading-relaxed ${i === 0 ? "text-base text-stone/85" : "text-sm text-graphite"}`}>{r.body}</p>
+              <div className={`mt-5 flex items-center gap-3 border-t pt-4 ${i === 0 ? "border-stone/15" : "border-nickel/15"}`}>
                 <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blacknickel font-display text-sm text-brass">
                   {r.customer_name.charAt(0)}
                 </span>
-                <p className="font-body text-xs text-ink">{r.customer_name}</p>
+                <p className={`font-body text-xs ${i === 0 ? "text-stone" : "text-ink"}`}>{r.customer_name}</p>
               </div>
             </div>
           </Reveal>

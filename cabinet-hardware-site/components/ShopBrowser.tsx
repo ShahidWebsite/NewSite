@@ -78,7 +78,7 @@ export default function ShopBrowser({
   }
 
   return (
-    <div className="mx-auto max-w-[1400px] px-6 py-16">
+    <div className="mx-auto max-w-[1500px] px-3 py-16">
       <h1 className="font-display text-4xl text-ink">{heading}</h1>
 
       <div className="mt-8 grid gap-8 md:grid-cols-[200px_1fr]">

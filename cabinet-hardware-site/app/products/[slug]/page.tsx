@@ -211,7 +211,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   };
 
   return (
-    <div className="mx-auto max-w-[1400px] px-6 py-16">
+    <div className="mx-auto max-w-[1500px] px-3 py-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -236,20 +236,22 @@ export default async function ProductPage({ params }: { params: { slug: string }
       </nav>
 
       <div className="grid gap-12 md:grid-cols-2">
-        <ProductGallery images={product.images} productName={product.name} />
+        <div className="md:sticky md:top-28 md:self-start">
+          <ProductGallery images={product.images} productName={product.name} />
+        </div>
 
-        <div>
+        <div className="flex flex-col">
           <h1 className="font-display text-4xl text-ink">{product.name}</h1>
           {product.model_code && (
             <p className="mt-2 font-body text-sm text-graphite">Model code: {product.model_code}</p>
           )}
-          <div className="mt-4 max-w-prose space-y-3 font-body text-graphite">
+          <div className="order-3 mt-8 max-w-prose space-y-3 border-t border-nickel/30 pt-6 font-body text-graphite">
             {descriptionParagraphs.map((para, i) => (
               <p key={i}>{para}</p>
             ))}
           </div>
 
-          <div className="mt-8">
+          <div className="order-2 mt-6 rounded-2xl border border-nickel/30 bg-white/50 p-5 md:p-6">
             <VariantSelector
               productId={product.id}
               productName={product.name}
@@ -261,7 +263,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
           </div>
 
           {Object.keys(product.specs).length > 0 && (
-            <div className="mt-10 border-t border-nickel/30 pt-6">
+            <div className="order-4 mt-8 rounded-2xl bg-[#F5F1EA] p-5 md:p-6">
               <p className="mb-3 font-body text-sm text-graphite">Specifications</p>
               <dl className="grid grid-cols-2 gap-y-2 font-body text-sm">
                 {Object.entries(product.specs).map(([key, value]) => (
@@ -274,7 +276,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
             </div>
           )}
 
-          <div className="mt-8 border-t border-nickel/30 pt-6">
+          <div className="order-5 mt-8 border-t border-nickel/30 pt-6">
             <ShareButtons path={`/products/${product.slug}`} text={`${product.name} — ${BRAND}`} />
           </div>
         </div>

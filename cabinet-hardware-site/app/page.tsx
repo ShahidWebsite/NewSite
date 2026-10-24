@@ -63,6 +63,55 @@ async function getCategories() {
   return data ?? [];
 }
 
+const HERO_FINISHES = [
+  { name: "Antique Brass", gradient: "radial-gradient(circle at 30% 28%, #E3C98F 0%, #B08A45 45%, #6E5320 100%)" },
+  { name: "Golden", gradient: "radial-gradient(circle at 30% 28%, #F3DC98 0%, #D4A83C 45%, #8F6B14 100%)" },
+  { name: "Matte Black", gradient: "radial-gradient(circle at 30% 28%, #55504A 0%, #24211D 55%, #0E0D0B 100%)" },
+  { name: "Chrome", gradient: "radial-gradient(circle at 30% 28%, #FFFFFF 0%, #BDBDBD 45%, #7C7C7C 100%)" },
+];
+const HERO_SIZES = ["64mm", "96mm", "128mm", "160mm", "192mm"];
+
+const TRUST_ITEMS = [
+  {
+    icon: (
+      <path
+        d="M4 15L15 4M8 16l-4-4M9 20l3-3M4 11l4 4m5-11l4 4m-8 4l4 4"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    ),
+    title: "Exact specs, every listing",
+    body: "Hole spacing, material, and weight are listed on every product — no guessing before your cabinets arrive.",
+  },
+  {
+    icon: (
+      <>
+        <path d="M3 9l9-5 9 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M5 9v9m4-9v9m4-9v9m4-9v9M3 20h18" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      </>
+    ),
+    title: "Bank transfer accepted",
+    body: "Pay by direct bank transfer with your order number as reference — details are shown at checkout.",
+  },
+  {
+    icon: (
+      <>
+        <path
+          d="M12 21s7-6.1 7-11.5A7 7 0 105 9.5C5 14.9 12 21 12 21z"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+        />
+        <circle cx="12" cy="9.5" r="2.3" stroke="currentColor" strokeWidth="1.4" />
+      </>
+    ),
+    title: "Track your order",
+    body: "Look up your order anytime with your order number and email to see its current status.",
+  },
+];
+
 export default async function HomePage() {
   const [products, categories, posts] = await Promise.all([getFeaturedProducts(), getCategories(), getLatestPosts()]);
 
@@ -71,7 +120,7 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="bg-stone-50">
         <div className="mx-auto max-w-[1500px] px-3 pt-6">
-        <div className="grid gap-10 rounded-2xl bg-blacknickel px-8 py-12 text-stone shadow-lg md:grid-cols-2 md:items-center md:px-12 md:py-16">
+        <div className="grid gap-10 rounded-2xl bg-blacknickel px-8 py-12 text-stone shadow-lg md:grid-cols-[1.45fr_1fr] md:items-center md:px-12 md:py-14">
           <div>
             <p className="rise font-body text-sm text-brass">Dream Hardware at your Door Step</p>
             <h1 className="rise-lcp mt-4 font-display text-5xl leading-[1.05] md:text-6xl">
@@ -100,28 +149,64 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Finish swatches — a literal, materials-first hero element */}
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { name: "Matte Black", hex: "#1C1B19" },
-              { name: "Golden", hex: "#A9832E" },
-              { name: "Chrome", hex: "#9B9992" },
-            ].map((finish, i) => (
-              <Link
-                key={finish.name}
-                href={`/shop?color=${encodeURIComponent(finish.name)}`}
-                className="rise group space-y-3"
-                style={{ "--d": `${360 + i * 110}ms` } as React.CSSProperties}
-              >
-                <div
-                  className="aspect-square rounded-full border-2 border-stone/40 ring-1 ring-black/20 transition-transform group-hover:scale-105"
-                  style={{ backgroundColor: finish.hex }}
-                />
-                <p className="text-center font-body text-xs text-stone/60 group-hover:text-stone">{finish.name}</p>
-              </Link>
-            ))}
+          {/* Finish + size quick-picks: fills the right side of the hero and
+              sends buyers straight into the filtered shop. */}
+          <div
+            className="rise rounded-2xl border border-stone/10 bg-white/[0.04] p-6 md:p-8"
+            style={{ "--d": "360ms" } as React.CSSProperties}
+          >
+            <p className="font-body text-xs uppercase tracking-[0.14em] text-brass">Shop by finish</p>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {HERO_FINISHES.map((finish) => (
+                <Link
+                  key={finish.name}
+                  href={`/shop?color=${encodeURIComponent(finish.name)}`}
+                  className="group flex items-center gap-3 rounded-xl border border-stone/15 p-2.5 transition-colors hover:border-brass"
+                >
+                  <span
+                    className="h-11 w-11 flex-none rounded-full ring-1 ring-black/30 transition-transform group-hover:scale-105"
+                    style={{ background: finish.gradient }}
+                  />
+                  <span className="font-body text-sm text-stone/90">{finish.name}</span>
+                </Link>
+              ))}
+            </div>
+
+            <p className="mt-7 font-body text-xs uppercase tracking-[0.14em] text-brass">Find by size</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {HERO_SIZES.map((size) => (
+                <Link
+                  key={size}
+                  href={`/shop?size=${encodeURIComponent(size)}`}
+                  className="press rounded border border-stone/25 px-3.5 py-2.5 font-body text-sm text-stone transition-colors hover:border-brass hover:text-brass"
+                >
+                  {size.replace("mm", " mm")}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
+        </div>
+      </section>
+
+      {/* Trust strip: same three messages as before, now right under the hero */}
+      <section className="mx-auto max-w-[1500px] px-3">
+        <div className="grid border-b border-nickel/25 md:grid-cols-3 md:divide-x md:divide-nickel/25">
+          {TRUST_ITEMS.map((item, i) => (
+            <Reveal key={item.title} delay={i * 80}>
+              <div className="flex h-full gap-4 px-2 py-7 md:px-8 md:first:pl-2">
+                <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-brass text-stone shadow-sm">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    {item.icon}
+                  </svg>
+                </span>
+                <div>
+                  <p className="font-display text-xl text-ink">{item.title}</p>
+                  <p className="mt-1 font-body text-sm text-graphite">{item.body}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </section>
 
@@ -131,21 +216,30 @@ export default async function HomePage() {
           <Reveal>
             <h2 className="font-display text-3xl text-ink">Shop by category</h2>
           </Reveal>
-          <div className="mt-5 grid gap-6 sm:grid-cols-2 md:grid-cols-4">
-            {categories.map((cat, i) => (
-              <Reveal key={cat.id} delay={i * 60}>
-                <Link
-                  href={`/${cat.slug}`}
-                  className="group block border border-nickel/30 transition-all duration-300 hover:-translate-y-0.5 hover:border-brass hover:shadow-[0_10px_25px_-15px_rgba(42,40,37,0.3)]"
-                >
-                  <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-ink/[0.06] to-brass/10">
+          <div
+            className={
+              categories.length === 5
+                ? "mt-5 grid gap-4 sm:grid-cols-2 md:grid-cols-4 md:grid-rows-2"
+                : "mt-5 grid gap-4 sm:grid-cols-2 md:grid-cols-4"
+            }
+          >
+            {categories.map((cat, i) => {
+              const featured = categories.length === 5 && i === 0;
+              return (
+                <Reveal key={cat.id} delay={i * 60} className={featured ? "md:col-span-2 md:row-span-2" : ""}>
+                  <Link
+                    href={`/${cat.slug}`}
+                    className={`group relative block overflow-hidden rounded-2xl bg-gradient-to-br from-[#F4EEE0] to-[#E6DAC0] ${
+                      featured ? "aspect-[4/3] md:aspect-auto md:h-full md:min-h-[26rem]" : "aspect-[4/3]"
+                    }`}
+                  >
                     {cat.image_url ? (
                       <Image
                         src={cat.image_url}
                         alt={cat.name}
                         fill
-                        sizes="(min-width: 768px) 25vw, 50vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+                        sizes={featured ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"}
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
@@ -156,16 +250,15 @@ export default async function HomePage() {
                         </svg>
                       </div>
                     )}
-                  </div>
-                  <div className="flex items-center justify-between px-5 py-4">
-                    <span className="font-display text-lg text-ink">{cat.name}</span>
-                    <span className="font-body text-graphite transition-transform duration-300 group-hover:translate-x-1 group-hover:text-brass">
-                      →
-                    </span>
-                  </div>
-                </Link>
-              </Reveal>
-            ))}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-blacknickel/80 via-blacknickel/10 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-5 py-4 text-stone">
+                      <span className={`font-display ${featured ? "text-3xl" : "text-xl"}`}>{cat.name}</span>
+                      <span className="font-body transition-transform duration-300 group-hover:translate-x-1">→</span>
+                    </div>
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
         </section>
       )}
@@ -209,71 +302,6 @@ export default async function HomePage() {
             .
           </p>
         </Reveal>
-      </section>
-
-      {/* Trust / specs section */}
-      <section className="border-y border-nickel/20 bg-[#F5F1EA] py-16">
-        <div className="mx-auto max-w-[1500px] px-3">
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                icon: (
-                  <path
-                    d="M4 15L15 4M8 16l-4-4M9 20l3-3M4 11l4 4m5-11l4 4m-8 4l4 4"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                ),
-                title: "Exact specs, every listing",
-                body: "Hole spacing, material, and weight are listed on every product — no guessing before your cabinets arrive.",
-              },
-              {
-                icon: (
-                  <>
-                    <path d="M3 9l9-5 9 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                    <path
-                      d="M5 9v9m4-9v9m4-9v9m4-9v9M3 20h18"
-                      stroke="currentColor"
-                      strokeWidth="1.4"
-                      strokeLinecap="round"
-                    />
-                  </>
-                ),
-                title: "Bank transfer accepted",
-                body: "Pay by direct bank transfer with your order number as reference — details are shown at checkout.",
-              },
-              {
-                icon: (
-                  <>
-                    <path
-                      d="M12 21s7-6.1 7-11.5A7 7 0 105 9.5C5 14.9 12 21 12 21z"
-                      stroke="currentColor"
-                      strokeWidth="1.4"
-                      strokeLinejoin="round"
-                    />
-                    <circle cx="12" cy="9.5" r="2.3" stroke="currentColor" strokeWidth="1.4" />
-                  </>
-                ),
-                title: "Track your order",
-                body: "Look up your order anytime with your order number and email to see its current status.",
-              },
-            ].map((item, i) => (
-              <Reveal key={item.title} delay={i * 100}>
-                <div className="group h-full rounded-lg border border-nickel/30 bg-white px-6 py-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brass hover:shadow-md">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brass text-stone shadow-sm">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      {item.icon}
-                    </svg>
-                  </span>
-                  <p className="mt-4 font-display text-xl text-ink">{item.title}</p>
-                  <p className="mt-3 font-body text-sm text-graphite">{item.body}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
       </section>
 
       <Testimonials />

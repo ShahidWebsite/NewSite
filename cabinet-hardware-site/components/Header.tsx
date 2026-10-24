@@ -23,8 +23,9 @@ export default function Header({ categories = [] }: { categories?: { name: strin
   }
 
   return (
-    <header className="border-b border-nickel/30">
-      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-5">
+    <header className="sticky top-3 z-40 px-3 pt-3">
+      <div className="mx-auto max-w-[1500px] rounded-2xl border border-nickel/30 bg-stone/90 shadow-[0_10px_30px_-12px_rgba(42,40,37,0.35)] backdrop-blur-md">
+      <div className="flex items-center justify-between gap-4 px-5 py-3">
         <Link href="/" className="flex items-center gap-3">
           <img src="/logo.png?v=3" alt="Shahid Iqbal & Co logo" className="h-11 w-11" />
           <span className="font-display text-2xl tracking-tight text-ink">
@@ -32,7 +33,7 @@ export default function Header({ categories = [] }: { categories?: { name: strin
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 font-body text-sm text-graphite md:flex">
+        <nav className="hidden items-center gap-6 font-body text-sm text-graphite lg:flex">
           <Link href="/shop" className="link-slide hover:text-ink">Shop</Link>
           {categories.slice(0, 4).map((c) => (
             <Link key={c.slug} href={`/${c.slug}`} className="link-slide hover:text-ink">{c.name}</Link>
@@ -91,7 +92,7 @@ export default function Header({ categories = [] }: { categories?: { name: strin
           )}
           <Link
             href="/cart"
-            className="font-body text-sm text-ink underline decoration-nickel decoration-1 underline-offset-4 hover:decoration-brass"
+            className="flex h-10 items-center gap-2 rounded-full border border-nickel/40 px-4 font-body text-sm text-ink transition-colors hover:border-brass hover:text-brass"
           >
             Cart
             {itemCount > 0 && (
@@ -101,7 +102,7 @@ export default function Header({ categories = [] }: { categories?: { name: strin
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-9 w-9 flex-col items-center justify-center gap-1.5 md:hidden"
+            className="flex h-9 w-9 flex-col items-center justify-center gap-1.5 lg:hidden"
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
           >
@@ -113,7 +114,7 @@ export default function Header({ categories = [] }: { categories?: { name: strin
       </div>
 
       {menuOpen && (
-        <nav className="menu-in flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite md:hidden">
+        <nav className="menu-in flex flex-col gap-1 border-t border-nickel/20 px-6 py-4 font-body text-sm text-graphite lg:hidden">
           <Link href="/shop" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Shop</Link>
           {categories.map((c) => (
             <Link key={c.slug} href={`/${c.slug}`} onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">{c.name}</Link>
@@ -123,6 +124,7 @@ export default function Header({ categories = [] }: { categories?: { name: strin
           <Link href="/contact" onClick={() => setMenuOpen(false)} className="py-2 hover:text-ink">Contact</Link>
         </nav>
       )}
+      </div>
     </header>
   );
 }
