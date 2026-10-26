@@ -55,6 +55,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   });
 }
 
+// Posts written in the admin often have an excerpt that is just the first
+// sentence of the article (cut off with "…"). Showing both repeats the opening.
+function excerptRepeatsOpening(excerpt: string, content: string) {
+  const norm = (t: string) => t.toLowerCase().replace(/[…\s]+$/g, "").replace(/\s+/g, " ").trim();
+  const e = norm(excerpt);
+  const first = norm(firstParagraph(content));
+  return e.length > 20 && first.startsWith(e.slice(0, Math.min(e.length, 80)));
+}
+
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = await getPost(params.slug);
   if (!post) notFound();
@@ -136,7 +145,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         </nav>
 
         <h1 className="font-display text-4xl leading-[1.08] text-ink md:text-5xl">{post.title}</h1>
-        {post.excerpt && <p className="mt-5 font-display text-xl italic leading-snug text-graphite">{post.excerpt}</p>}
+        {post.excerpt && !excerptRepeatsOpening(post.excerpt, post.content) && (
+          <p className="mt-5 font-display text-xl italic leading-snug text-graphite">{post.excerpt}</p>
+        )}
         <p className="mt-5 font-body text-sm text-graphite">
           By {BRAND}
           {" — "}

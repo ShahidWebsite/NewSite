@@ -11,7 +11,8 @@ import Link from "next/link";
 export type Block =
   | { type: "h2" | "h3"; text: string; id: string }
   | { type: "p"; text: string }
-  | { type: "ul" | "ol"; items: string[] }
+  | { type: "ul"; items: string[] }
+  | { type: "ol"; items: string[]; start: number }
   | { type: "quote"; text: string }
   | { type: "hr" }
   | { type: "table"; head: string[]; rows: string[][] }
@@ -129,12 +130,13 @@ export function parseMarkdown(source: string): Block[] {
     if (/^\d+[.)]\s+/.test(trimmed)) {
       flushPara();
       const items: string[] = [];
+      const start = parseInt(trimmed, 10) || 1;
       while (i < lines.length && /^\d+[.)]\s+/.test(lines[i].trim())) {
         items.push(lines[i].trim().replace(/^\d+[.)]\s+/, ""));
         i++;
       }
       i--;
-      blocks.push({ type: "ol", items });
+      blocks.push({ type: "ol", items, start });
       continue;
     }
 
@@ -258,7 +260,7 @@ export function Markdown({ source }: { source: string }) {
             );
           case "ol":
             return (
-              <ol key={key} className="mt-4 list-decimal space-y-2 pl-6 marker:text-brass">
+              <ol key={key} start={b.start} className="mt-4 list-decimal space-y-2 pl-6 marker:text-brass">
                 {b.items.map((it, j) => <li key={j}>{renderInline(it, `${key}-${j}`)}</li>)}
               </ol>
             );

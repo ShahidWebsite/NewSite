@@ -222,7 +222,12 @@ export function generateSeoTitle(i: ProductSeoInput) {
     `${name} — Buy Online | ${BRAND}`,
     `${name} | ${BRAND}`,
   ];
-  return candidates.find((c) => c.length <= 60) ?? truncateAtWord(candidates[4], 60);
+  const fit = candidates.find((c) => c.length <= 60);
+  if (fit) return fit;
+  // Long product names: shorten the NAME, never the brand, so the title always
+  // ends with "| Shahid Iqbal & Co" instead of being cut off mid-name.
+  const suffix = ` | ${BRAND}`;
+  return `${truncateAtWord(name, 60 - suffix.length)}${suffix}`;
 }
 
 export function generateSeoDescription(i: ProductSeoInput) {
