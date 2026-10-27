@@ -294,20 +294,73 @@ export default async function HomePage() {
       {/* Lahore first, Pakistan-wide: short natural text, no keyword-stuffed region grid */}
       <section className="mx-auto max-w-[1500px] px-3 py-10">
         <Reveal>
-          <h2 className="font-display text-3xl text-ink">Based in Lahore, delivering all over Pakistan</h2>
-          <p className="mt-3 max-w-3xl font-body text-graphite">
-            In Lahore? Visit Shahid Iqbal &amp; Co at 218/18 Ferozepur Road, near WAPDA Hospital, or order
-            online.{" "}
-            <Link href={`/blog/${LAHORE_GUIDE_SLUG}`} className="text-ink underline hover:text-brass">
-              Where to buy in Lahore
-            </Link>
-            . Outside Lahore? We send orders to Islamabad, Karachi, Faisalabad, Multan, Peshawar and every other
-            city in Pakistan, by bank transfer or Cash on Delivery. Hardware shop or trade buyer?{" "}
-            <Link href={`/blog/${WHOLESALE_HUB_SLUG}`} className="text-ink underline hover:text-brass">
-              See how wholesale works
-            </Link>
-            .
-          </p>
+          <div className="rounded-3xl bg-blacknickel px-6 py-10 text-stone md:px-12 md:py-14">
+            <div className="flex items-center gap-3">
+              <span className="h-px w-10 bg-brass" aria-hidden="true" />
+              <span className="font-body text-xs uppercase tracking-[0.2em] text-brass">Shahid Iqbal &amp; Co</span>
+            </div>
+            <h2 className="mt-4 max-w-3xl font-display text-3xl text-stone md:text-4xl">
+              Based in Lahore, delivering all over Pakistan
+            </h2>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              {/* Lahore */}
+              <div className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brass/15 text-brass" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
+                    <circle cx="12" cy="10" r="2.4" />
+                  </svg>
+                </span>
+                <h3 className="mt-4 font-display text-xl text-stone">In Lahore?</h3>
+                <p className="mt-2 flex-1 font-body text-sm leading-relaxed text-stone/75">
+                  Visit Shahid Iqbal &amp; Co at 218/18 Ferozepur Road, near WAPDA Hospital, or order online.
+                </p>
+                <Link
+                  href={`/blog/${LAHORE_GUIDE_SLUG}`}
+                  className="mt-5 inline-flex items-center gap-2 font-body text-sm font-medium text-brass hover:text-stone"
+                >
+                  Where to buy in Lahore <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+
+              {/* Outside Lahore */}
+              <div className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brass/15 text-brass" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 7h11v9H3z" />
+                    <path d="M14 10h4l3 3v3h-7z" />
+                    <circle cx="7" cy="17.5" r="1.7" />
+                    <circle cx="17" cy="17.5" r="1.7" />
+                  </svg>
+                </span>
+                <h3 className="mt-4 font-display text-xl text-stone">Outside Lahore?</h3>
+                <p className="mt-2 flex-1 font-body text-sm leading-relaxed text-stone/75">
+                  We send orders to Islamabad, Karachi, Faisalabad, Multan, Peshawar and every other city in
+                  Pakistan, by bank transfer or Cash on Delivery.
+                </p>
+              </div>
+
+              {/* Trade buyers */}
+              <div className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brass/15 text-brass" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l1.5-5h15L21 9" />
+                    <path d="M3 9h18v0a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z" />
+                    <path d="M5 12v8h14v-8" />
+                  </svg>
+                </span>
+                <h3 className="mt-4 font-display text-xl text-stone">Hardware shop or trade buyer?</h3>
+                <div className="flex-1" />
+                <Link
+                  href={`/blog/${WHOLESALE_HUB_SLUG}`}
+                  className="mt-5 inline-flex items-center gap-2 font-body text-sm font-medium text-brass hover:text-stone"
+                >
+                  See how wholesale works <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </Reveal>
       </section>
 
